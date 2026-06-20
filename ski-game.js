@@ -811,25 +811,9 @@
     return `rgb(${Math.round(lerp(a.r, b.r, f))},${Math.round(lerp(a.g, b.g, f))},${Math.round(lerp(a.b, b.b, f))})`;
   }
 
+  // 極簡化：不再載入主題背景 SVG，一律走程序化背景（drawStars + drawMountains）
   function ensureThemeBackground(symbol) {
-    const key = normalizeThemeSymbol(symbol);
-    if (!key) return null;
-    let entry = themeBackgroundCache.get(key);
-    if (!entry) {
-      const img = new Image();
-      entry = {
-        key,
-        src: `${THEME_BACKGROUND_BASE}/${key}.svg`,
-        img,
-        status: 'loading',
-      };
-      img.decoding = 'async';
-      img.onload = () => { entry.status = 'ready'; };
-      img.onerror = () => { entry.status = 'error'; };
-      img.src = entry.src;
-      themeBackgroundCache.set(key, entry);
-    }
-    return entry;
+    return null;
   }
 
   function getPropSpriteKey(kind) {
@@ -847,42 +831,14 @@
     };
   }
 
+  // 極簡化：不再載入任何 PNG/SVG 道具精靈圖
   function ensurePropSprite(kind) {
-    const spec = getPropSpriteSpec(kind);
-    if (!spec) return null;
-    let entry = propSpriteCache.get(spec.key);
-    if (!entry) {
-      const img = new Image();
-      entry = {
-        key: spec.key,
-        src: spec.src,
-        raw: spec.raw,
-        img,
-        status: 'loading',
-      };
-      img.decoding = 'async';
-      img.onload = () => { entry.status = 'ready'; };
-      img.onerror = () => { entry.status = 'error'; };
-      img.src = entry.src;
-      propSpriteCache.set(spec.key, entry);
-    }
-    return entry;
+    return null;
   }
 
+  // 極簡化：不再 fetch manifest.json（assets/ 已移除），主題直接用內建 preset
   function ensureThemeManifest() {
-    if (themeManifestMap || themeManifestPromise || typeof fetch !== 'function') return themeManifestPromise;
-    themeManifestPromise = fetch(THEME_MANIFEST_URL, { cache: 'force-cache' })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((payload) => {
-        themeManifestMap = new Map();
-        for (const item of payload?.stocks || []) {
-          themeManifestMap.set(normalizeThemeSymbol(item.symbol), item);
-        }
-        activeTerrainTheme = buildActiveTerrainTheme(stockData?.symbol);
-        return themeManifestMap;
-      })
-      .catch(() => null);
-    return themeManifestPromise;
+    return null;
   }
 
   function getThemeManifestEntry(symbol) {
@@ -1134,7 +1090,7 @@
       symbol: symbol || '',
       name: entry?.name || symbol || '',
       industryClass: entry?.industryClass || 'Theme',
-      environmentBiome: entry?.environmentBiome || '滑雪山體',
+      environmentBiome: entry?.environmentBiome || 'Mountain Terrain',
       props: companyProps,
       heroProps,
       mixerLogic: entry?.mixerLogic || '',
@@ -1176,10 +1132,10 @@
 
   function getExecutionRating() {
     const stars = getEarnedStars();
-    if (stars >= 3) return { badge: 'AAA', summary: '風控紀律近乎零偏差' };
-    if (stars === 2) return { badge: 'AA', summary: '策略執行穩健，收益與風險平衡' };
-    if (stars === 1) return { badge: 'A', summary: '已完成建倉，仍可再壓低追蹤誤差' };
-    return { badge: 'B', summary: '完成執行，但風險控制仍待優化' };
+    if (stars >= 3) return { badge: 'AAA', summary: 'Risk discipline near-zero deviation' };
+    if (stars === 2) return { badge: 'AA', summary: 'Solid execution — returns and risk well balanced' };
+    if (stars === 1) return { badge: 'A', summary: 'Position built — tracking error can still be tightened' };
+    return { badge: 'B', summary: 'Execution complete — risk controls still need work' };
   }
 
   function unlockMedal(key) {
@@ -1213,76 +1169,7 @@
   }
 
   function getFallbackEducationData() {
-    const symbol = stockData?.symbol || '這組代碼';
-    return {
-      symbol,
-      preview: {
-        headline: `${symbol} 纜車預習`,
-        summary: '教育資料暫時不可用，先用通用節點帶你看公司故事、波動與技術地形。',
-      },
-      nodes: [
-        {
-          title: '第一站：公司故事',
-          type: 'history',
-          summary: '先把公司放回產業脈絡中，會比只盯著一天漲跌更容易理解它的市場角色。',
-          bullets: [
-            '先看公司定位，不急著判斷一天的漲跌。',
-            '把產品、客戶與產業位置串起來，後面的波動才有故事。',
-            '公司故事是這趟滑雪的地圖底稿。',
-          ],
-          question: '理解一家公司時，哪一件事最適合放在第一步？',
-          choices: [
-            '公司定位與商業故事',
-            '先看單日漲跌，再回頭找理由',
-            '只看市場熱門題材，不管產品與客戶',
-            '只依技術指標，不檢查公司脈絡',
-          ],
-          answerIndex: 0,
-          explanation: '公司定位能讓後面的價格波動變得有脈絡。',
-          sourceKind: 'fallback',
-        },
-        {
-          title: '第二站：近期波動',
-          type: 'volatility',
-          summary: '價格突然震盪時，應該同時看新聞、量能與價格位置，而不是只看單一漲跌。',
-          bullets: [
-            '突然變陡時，先問市場正在重新定價什麼。',
-            '新聞、量能與價格位置要一起看。',
-            '單一漲跌不等於完整原因，交叉檢查比較穩。',
-          ],
-          question: '面對突然放大的震盪，第一步應該交叉檢查什麼？',
-          choices: [
-            '新聞、量能與價格',
-            '只看價格方向，先不管事件原因',
-            '只看成交量變大，就直接判斷趨勢成立',
-            '只看熱門討論度，忽略價格所在位置',
-          ],
-          answerIndex: 0,
-          explanation: '事件、量能與價格一起看，才比較不會誤判。',
-          sourceKind: 'fallback',
-        },
-        {
-          title: '第三站：技術地形',
-          type: 'technical',
-          summary: '滑雪地形是價格路徑的遊戲化版本，坡度與轉折會讓你感覺這段行情的節奏。',
-          bullets: [
-            '坡度代表價格變化的節奏。',
-            '急轉彎通常對應較大的行情轉折。',
-            '滑雪不是只拚速度，也是在練習跟住價格路徑。',
-          ],
-          question: '滑雪地形主要對應什麼？',
-          choices: [
-            '價格路徑與波動',
-            '公司新聞的重要程度排序',
-            '市場情緒熱度的單一分數',
-            '玩家按鍵速度造成的隨機坡度',
-          ],
-          answerIndex: 0,
-          explanation: '地形起伏來自走勢資料，所以滑雪同時也是讀圖練習。',
-          sourceKind: 'fallback',
-        },
-      ],
-    };
+    return { symbol: stockData?.symbol || 'this ticker', preview: {}, nodes: [] };
   }
 
   function buildEducationSession() {
@@ -1328,14 +1215,14 @@
   }
 
   function getEducationGrade() {
-    if (!educationSession?.nodes?.length) return { grade: 'C', correct: 0, total: 0, summary: '尚未完成教育題' };
+    if (!educationSession?.nodes?.length) return { grade: 'C', correct: 0, total: 0, summary: 'No knowledge questions completed' };
     const total = educationSession.nodes.length;
     const correct = educationSession.correct.filter(Boolean).length;
     const ratio = correct / Math.max(1, total);
-    if (ratio >= 0.95) return { grade: 'S', correct, total, summary: '公司脈絡掌握得很完整' };
-    if (ratio >= 0.75) return { grade: 'A', correct, total, summary: '理解穩定，少數節點可複習' };
-    if (ratio >= 0.5) return { grade: 'B', correct, total, summary: '已抓到主軸，但震盪原因還能再看一次' };
-    return { grade: 'C', correct, total, summary: '建議回纜車站重新預習' };
+    if (ratio >= 0.95) return { grade: 'S', correct, total, summary: 'Company context fully mastered' };
+    if (ratio >= 0.75) return { grade: 'A', correct, total, summary: 'Solid understanding — a few stations worth revisiting' };
+    if (ratio >= 0.5) return { grade: 'B', correct, total, summary: 'Got the main thread — volatility causes could use another pass' };
+    return { grade: 'C', correct, total, summary: 'Recommend heading back to the cable car for a re-read' };
   }
 
   function getCableScoreSummary() {
@@ -1497,10 +1384,10 @@
     educationSession.answerTimes[index] = Math.min(elapsedSeconds, EDUCATION_QUESTION_LIMIT_SECONDS);
     educationSession.questionScores[index] = questionScore;
     educationSession.feedback = timedOut
-      ? `時間到，這題算錯。${node.explanation}`
+      ? `Time's up — marked wrong. ${node.explanation}`
       : isCorrect
-        ? `答對了，速度越快分數越高。${node.explanation}`
-        : `再看一次會更穩。${node.explanation}`;
+        ? `Correct! The faster you answer, the higher your score. ${node.explanation}`
+        : `Look again — review helps. ${node.explanation}`;
     educationSession.awaitingContinue = true;
   }
 
@@ -1548,18 +1435,7 @@
   }
 
   function maybeTriggerEducationStation() {
-    if (!educationSession || gameState !== 'playing') return false;
-    const firstQuizDelaySeconds = clamp(timeLimitSeconds * 0.25, 6, 18);
-    if (getElapsedSeconds() <= firstQuizDelaySeconds) return false;
-    const lastX = terrainPoints[terrainPoints.length - 1]?.x || 1;
-    const progress = (terrainScrollX + getCharX()) / Math.max(1, lastX);
-    const nextIndex = educationSession.routeTriggers.findIndex((trigger, index) => (
-      progress >= trigger && !educationSession.triggered.has(index) && !educationSession.answered[index]
-    ));
-    if (nextIndex < 0) return false;
-    educationSession.triggered.add(nextIndex);
-    enterEducationQuiz(nextIndex, 'mid');
-    return true;
+    return false;
   }
 
   function startFinalEducationQuizIfNeeded() {
@@ -1572,8 +1448,9 @@
   window.SkiGame = {
     launch(data, options = {}) {
       stockData    = data; // { symbol, closes: [], dates: [], period }
-      educationData = options.education || data.education || null;
-      highDetailMode = !!options.highDetail || !!HIGH_DETAIL_THEME_DIRS[normalizeThemeSymbol(data?.symbol)];
+      educationData = null;
+      // 極簡化：不再使用高細節模式（需依賴已刪除的 vista/texture PNG），固定為關閉
+      highDetailMode = false;
       practiceMode   = !!options.practice;
 
       if (practiceMode) {
@@ -1601,11 +1478,12 @@
       return null;
     },
     toggleDetail() {
-      highDetailMode = !highDetailMode;
+      // 極簡化：toggleDetail 不再有作用（無高細節素材）
+      highDetailMode = false;
       const btn = document.querySelector('.ski-detail-toggle');
       if (btn) {
         btn.classList.toggle('active', highDetailMode);
-        btn.querySelector('.detail-label').textContent = highDetailMode ? '高細節模式：開啟' : '低細節模式';
+        btn.querySelector('.detail-label').textContent = highDetailMode ? 'High Detail: On' : 'Low Detail';
       }
       refreshThemeAssets();
     }
@@ -1715,32 +1593,16 @@
     modal.className = 'ski-modal hidden';
     modal.innerHTML = `
       <canvas id="skiCanvas"></canvas>
-      <button class="ski-close-btn" onclick="SkiGame.close()">✕ 離開</button>
-      <button class="ski-detail-toggle ${highDetailMode ? 'active' : ''}" onclick="SkiGame.toggleDetail()">
-        <span class="detail-label">${highDetailMode ? '高細節模式：開啟' : '低細節模式'}</span>
-      </button>
-      <div class="ski-hint">🖱️ 滾輪上下移動 &nbsp;·&nbsp; 同時按住 ←→ 或 A+D 往右衝刺 &nbsp;·&nbsp; 別被拖到最左邊</div>
+      <button class="ski-close-btn" onclick="SkiGame.close()">X Exit</button>
+      <div class="ski-hint">Mouse wheel to move up/down &nbsp;·&nbsp; Hold Left+Right or A+D to sprint right &nbsp;·&nbsp; Don't get pushed off the left edge</div>
     `;
     return modal;
   }
 
-  // ── 主題資產加載 ──
+  // 極簡化：不再載入 vista/texture PNG，全程使用程序化背景與地形紋理
   function loadThemeAssets(symbol) {
     themeAssets = { vista: null, texture: null };
     highDetailVistaCache = { canvas: null, img: null, width: 0, height: 0 };
-    const sym = normalizeThemeSymbol(symbol);
-    const themeDir = HIGH_DETAIL_THEME_DIRS[sym];
-    if (!themeDir) return;
-
-    const vistaImg = new Image();
-    vistaImg.src = `assets/themes/${themeDir}/vista.png`;
-    vistaImg.onload = () => { themeAssets.vista = vistaImg; };
-    vistaImg.onerror = () => console.warn(`[theme] vista 載入失敗: ${vistaImg.src}`);
-
-    const textureImg = new Image();
-    textureImg.src = `assets/themes/${themeDir}/texture.png`;
-    textureImg.onload = () => { themeAssets.texture = textureImg; };
-    textureImg.onerror = () => console.warn(`[theme] texture 載入失敗: ${textureImg.src}`);
   }
 
 
@@ -1867,7 +1729,7 @@
     };
     resultButtonRects = null;
     educationOverlayRects = null;
-    educationSession = buildEducationSession();
+    educationSession = null;
     charVisualOffsetY = 0;
     terrainCameraOffsetY = 0;
     terrainCameraTargetOffsetY = 0;
@@ -1898,14 +1760,7 @@
     updateVerticalCameraOffset();
     updateCharacterVisualOffset();
 
-    gameState = educationSession?.nodes?.length ? 'education_intro' : 'countdown';
-    if (gameState === 'education_intro') {
-      educationSession.introProgress = 0;
-      educationSession.introIndex = 0;
-      educationSession.activeNodeIndex = 0;
-      educationSession.activeMode = 'intro';
-      syncEducationIntroFromProgress();
-    }
+    gameState = 'countdown';
     bindInput();
     updateCursorVisibility();
     animId = requestAnimationFrame(loop);
@@ -3617,7 +3472,9 @@
     ctx.restore();
   }
 
+  // 極簡化：場上不繪製任何道具（PNG/SVG 已全數移除），只保留地形、邊緣、雪、角色、HUD
   function drawTerrainProps(theme, fillPath, W, H) {
+    return; // 極簡化：no-op
     if (!theme?.placements?.length) return;
     const rawPropPrefix = HIGH_DETAIL_RAW_PROP_PREFIXES[theme.key] || '';
     const hasRawPropPack = rawPropPrefix && HIGH_DETAIL_RAW_PROP_THEMES.has(theme.key);
@@ -3881,13 +3738,13 @@
     let armAngle     = 0.05;  // 前臂向右延伸角度
 
     if (isDangerAbove) {
-      // ★ 太高危險：強烈後仰，不斷往上彈，快要飛走！
+      // High danger: strong backward lean and upward bounce.
       bodyAngle    = terrainAngle - 0.55 + Math.sin(t * 6) * 0.2;
       bounceY      = -Math.abs(Math.sin(t * 9)) * 11;
       crouchFactor = 0.08 + Math.abs(Math.sin(t * 7)) * 0.35;
       armAngle     = -0.65 + Math.sin(t * 8) * 0.45; // 手臂亂揮
     } else if (isDangerBelow) {
-      // ★ 太低危險：極端前傾，快撲地，身體顫抖！
+      // Low danger: extreme forward lean and unstable body.
       bodyAngle    = terrainAngle + 0.88 + Math.sin(t * 12) * 0.13;
       bounceY      = Math.sin(t * 10) * 3.5;
       crouchFactor = 0.04;
@@ -4024,7 +3881,7 @@
       ctx.fillStyle = `rgba(255,150,150,${ratio * pulse})`;
       ctx.textAlign = 'center';
       ctx.fillText(
-        isDangerAbove ? '⬆ 風險權重過高，立即下修！' : '⬇ 部位曝險不足，立即上修！',
+        isDangerAbove ? '⬆ Risk weight too high — drop it now!' : '⬇ Position exposure too low — lift it now!',
         W / 2,
         dir === 'top' ? 60 : H - 50
       );
@@ -4062,11 +3919,11 @@
     let modeLabel;
     if (practiceMode) {
       const s = practiceOpts.startPct, e = practiceOpts.endPct;
-      modeLabel = (s === 0 && e === 100) ? '🟡 練習模式' : `🟡 練習 ${s}%～${e}%`;
+      modeLabel = (s === 0 && e === 100) ? 'Practice' : `Practice ${s}%-${e}%`;
     } else {
-      modeLabel = '關卡';
+      modeLabel = 'Quest';
     }
-    ctx.fillText(`⛷️  ${stockData?.symbol || ''}  ${modeLabel}`, 16, 28);
+    ctx.fillText(`${stockData?.symbol || ''}  ${modeLabel}`, 16, 28);
 
     ctx.font = '600 10px Inter, sans-serif';
     ctx.fillStyle = 'rgba(191,219,254,0.9)';
@@ -4096,7 +3953,7 @@
     ctx.fillText(getElapsedSeconds().toFixed(2), W / 2, 34);
     ctx.font = '600 11px Inter, sans-serif';
     ctx.fillStyle = 'rgba(148,163,184,0.85)';
-    ctx.fillText(`目標期限 ${getQualifyingSeconds().toFixed(2)}s`, W / 2, 52);
+    ctx.fillText(`Target ${getQualifyingSeconds().toFixed(2)}s`, W / 2, 52);
 
     const accelActive = (rightKeyDown || rightMouseDown) && !(leftKeyDown || leftMouseDown);
     const brakeActive = (leftKeyDown || leftMouseDown) && !(rightKeyDown || rightMouseDown);
@@ -4168,7 +4025,7 @@
     ctx.font = '700 18px Inter, sans-serif';
     ctx.fillStyle = '#f8fafc';
     ctx.textBaseline = 'middle';
-    ctx.fillText('路程進度', routeRowX, routeBarY + routeBarH / 2);
+    ctx.fillText('Progress', routeRowX, routeBarY + routeBarH / 2);
 
     ctx.textAlign = 'right';
     ctx.font = '700 18px JetBrains Mono, monospace';
@@ -4199,12 +4056,12 @@
     ctx.textAlign = 'left';
     ctx.font = 'bold 20px Inter, sans-serif';
     ctx.fillStyle = timeRatio <= 0.3 ? '#f87171' : '#f8fafc';
-    ctx.fillText('時間值', smallRowX, timeBarY + hbH / 2);
+    ctx.fillText('Time', smallRowX, timeBarY + hbH / 2);
 
     ctx.textAlign = 'right';
     ctx.font = '700 18px JetBrains Mono, monospace';
     ctx.fillStyle = timeColor;
-    ctx.fillText(`🕒 ${Math.floor(timeRatio * 100)}%`, hbx + hbW + barLabelGap + smallValueW, timeBarY + hbH / 2);
+    ctx.fillText(`${Math.floor(timeRatio * 100)}%`, hbx + hbW + barLabelGap + smallValueW, timeBarY + hbH / 2);
 
     // 準確率條底框
     ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
@@ -4236,12 +4093,12 @@
     ctx.textAlign = 'left';
     ctx.font = 'bold 20px Inter, sans-serif';
     ctx.fillStyle = accuracyPct <= 78 ? '#f87171' : '#f8fafc';
-    ctx.fillText('準確值', smallRowX, hby + hbH / 2);
+    ctx.fillText('Accuracy', smallRowX, hby + hbH / 2);
     
     ctx.textAlign = 'right';
     ctx.font = '700 18px JetBrains Mono, monospace';
     ctx.fillStyle = heatColor;
-    ctx.fillText(`⚡ ${accuracyPct.toFixed(0)}%`, hbx + hbW + barLabelGap + smallValueW, hby + hbH / 2);
+    ctx.fillText(`${accuracyPct.toFixed(0)}%`, hbx + hbW + barLabelGap + smallValueW, hby + hbH / 2);
 
     if (isBoosting) {
       ctx.textAlign = 'center';
@@ -4249,7 +4106,7 @@
       ctx.fillStyle = '#fbbf24';
       ctx.shadowBlur = 14;
       ctx.shadowColor = 'rgba(251,191,36,0.85)';
-      ctx.fillText('滾輪靈敏模式', panelCx, gy - gaugeR - 18);
+      ctx.fillText('Scroll Boost Mode', panelCx, gy - gaugeR - 18);
       ctx.shadowBlur = 0;
     }
 
@@ -4467,15 +4324,15 @@
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#67e8f9';
     ctx.font = '900 13px Inter, sans-serif';
-    ctx.fillText('開場纜車導覽 · 拖曳黃點或滾輪換站', x + pad, y + pad);
+    ctx.fillText('Cable Car Intro · Drag the yellow dot or scroll to change stations', x + pad, y + pad);
 
     ctx.fillStyle = '#f8fafc';
     ctx.font = '900 28px Inter, sans-serif';
-    ctx.fillText(node.title || '教育節點', x + pad, y + pad + 30);
+    ctx.fillText(node.title || 'Knowledge Station', x + pad, y + pad + 30);
 
     ctx.fillStyle = 'rgba(148, 163, 184, 0.92)';
     ctx.font = '700 15px Inter, sans-serif';
-    ctx.fillText('這裡只放預習小抄，題目會留到滑雪途中或終點驗證。', x + pad, y + pad + 70);
+    ctx.fillText('This is your pre-run cheat sheet — questions come during the run or at the finish.', x + pad, y + pad + 70);
 
     let cursorY = y + pad + 112;
     const bullets = getIntroBullets(node);
@@ -4513,14 +4370,14 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(label, rect.x + rect.w / 2, rect.y + rect.h / 2);
     };
-    drawButton(prevRect, '上一站', false, index === 0);
-    drawButton(skipRect, '跳過導覽', false);
-    drawButton(nextRect, index < total - 1 ? '下一站' : '開始滑雪', true);
+    drawButton(prevRect, 'Prev', false, index === 0);
+    drawButton(skipRect, 'Skip Tour', false);
+    drawButton(nextRect, index < total - 1 ? 'Next' : 'Start Skiing', true);
 
     ctx.fillStyle = 'rgba(148, 163, 184, 0.78)';
     ctx.font = '700 13px Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('拖曳上方黃點：預覽任意位置｜跨過節點會切換下一站', W / 2, y + cardH + 16);
+    ctx.fillText('Drag the yellow dot to preview any position · Crossing a node advances to the next station', W / 2, y + cardH + 16);
 
     ctx.restore();
   }
@@ -4582,12 +4439,12 @@
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#67e8f9';
     ctx.font = '800 13px Inter, sans-serif';
-    const kicker = isIntro ? '開場纜車導覽' : isFinal ? '終點知識驗證' : '纜車站知識驗證';
+    const kicker = isIntro ? 'Cable Car Intro' : isFinal ? 'Final Knowledge Check' : 'Cable Car Knowledge Check';
     ctx.fillText(kicker, x + pad, y + pad);
 
     ctx.fillStyle = '#f8fafc';
     ctx.font = '900 28px Inter, sans-serif';
-    ctx.fillText(node.title || '教育節點', x + pad, y + pad + 28);
+    ctx.fillText(node.title || 'Knowledge Station', x + pad, y + pad + 28);
 
     ctx.fillStyle = 'rgba(203, 213, 225, 0.94)';
     ctx.font = '500 17px Inter, sans-serif';
@@ -4684,7 +4541,7 @@
     ctx.font = '800 16px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(isIntro ? (session.introIndex < session.nodes.length - 1 ? '下一站' : '開始滑雪') : '繼續', continueRect.x + continueRect.w / 2, continueRect.y + btnH / 2);
+    ctx.fillText(isIntro ? (session.introIndex < session.nodes.length - 1 ? 'Next' : 'Start Skiing') : 'Continue', continueRect.x + continueRect.w / 2, continueRect.y + btnH / 2);
 
     if (isIntro) {
       const skipRect = { x: x + pad, y: continueRect.y, w: 128, h: btnH };
@@ -4696,7 +4553,7 @@
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = '#cbd5e1';
-      ctx.fillText('跳過導覽', skipRect.x + skipRect.w / 2, skipRect.y + btnH / 2);
+      ctx.fillText('Skip Tour', skipRect.x + skipRect.w / 2, skipRect.y + btnH / 2);
     }
 
     ctx.restore();
@@ -4720,7 +4577,7 @@
     ctx.font = '500 18px Inter, sans-serif';
     ctx.fillStyle = 'rgba(148,163,184,0.8)';
     ctx.shadowBlur = 0;
-    ctx.fillText(`${stockData?.symbol} — 讓走勢線穿過你的 hitbox！`, W / 2, H / 2 + 80);
+    ctx.fillText(`${stockData?.symbol} — Keep the trend line inside your hitbox!`, W / 2, H / 2 + 80);
     ctx.restore();
   }
 
@@ -4735,10 +4592,10 @@
     const labelX = x + 24 * tableScale;
     const valueX = x + cardW - 24 * tableScale;
     const rows = [
-      ['完美滑行', `${getBandPct('perfect').toFixed(0)}% / ${getBandPct('light').toFixed(0)}% / ${getBandPct('mild').toFixed(0)}%`],
-      ['驚險擦邊', `${getBandPct('medium').toFixed(0)}% / ${getBandPct('heavy').toFixed(0)}%`],
-      ['通關時間 / 挑戰目標 / 速通加分', `${getElapsedSeconds().toFixed(2)}s / ${getQualifyingSeconds().toFixed(2)}s / +${earlyFinishBonus}`],
-      ['連段加分 / 完美節奏', `+${streakBonusScore} / ${getBestPerfectPct().toFixed(0)}%`],
+      ['Perfect Run', `${getBandPct('perfect').toFixed(0)}% / ${getBandPct('light').toFixed(0)}% / ${getBandPct('mild').toFixed(0)}%`],
+      ['Near Miss', `${getBandPct('medium').toFixed(0)}% / ${getBandPct('heavy').toFixed(0)}%`],
+      ['Clear Time / Target / Early Bonus', `${getElapsedSeconds().toFixed(2)}s / ${getQualifyingSeconds().toFixed(2)}s / +${earlyFinishBonus}`],
+      ['Streak Bonus / Perfect Rhythm', `+${streakBonusScore} / ${getBestPerfectPct().toFixed(0)}%`],
     ];
 
     ctx.save();
@@ -4759,12 +4616,12 @@
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#f8fafc';
-    ctx.fillText('闖關戰績', labelX, y + headerH * 0.34);
+    ctx.fillText('Run Stats', labelX, y + headerH * 0.34);
 
     ctx.font = '600 12px Inter, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(191, 219, 254, 0.9)';
-    ctx.fillText('路線評分：完美 10/12/14/16/18/20，輕擦 7，搖晃 5，重摔 3，極限 1', labelX, y + headerH * 0.72);
+    ctx.fillText('Route Score: Perfect 10/12/14/16/18/20, Light 7, Mild 5, Heavy 3, Extreme 1', labelX, y + headerH * 0.72);
 
     rows.forEach((row, index) => {
       const rowY = y + headerH + index * rowH;
@@ -4808,10 +4665,10 @@
     ctx.textBaseline = 'middle';
     ctx.font = '800 15px Inter, sans-serif';
     ctx.fillStyle = '#bae6fd';
-    ctx.fillText('知識試煉評級', x + 22, y + 24);
+    ctx.fillText('Knowledge Trial Rating', x + 22, y + 24);
     ctx.font = '600 13px Inter, sans-serif';
     ctx.fillStyle = 'rgba(226, 232, 240, 0.82)';
-    ctx.fillText(`${rating.correct}/${rating.total} 題正確 · ${rating.summary}`, x + 22, y + 50);
+    ctx.fillText(`${rating.correct}/${rating.total} correct · ${rating.summary}`, x + 22, y + 50);
     ctx.textAlign = 'right';
     ctx.font = '900 42px Inter, sans-serif';
     ctx.fillStyle = rating.grade === 'S' ? '#fde68a' : rating.grade === 'A' ? '#86efac' : rating.grade === 'B' ? '#93c5fd' : '#fca5a5';
@@ -4828,7 +4685,7 @@
     const startX = W / 2 - totalW / 2;
     const labels = [
       { text: retryLabel, x: startX, colorA: '#1d4ed8', colorB: '#0891b2', border: 'rgba(147,197,253,0.7)' },
-      { text: '結束冒險', x: startX + btnW + gap, colorA: '#1e293b', colorB: '#334155', border: 'rgba(148,163,184,0.45)' },
+      { text: 'Exit', x: startX + btnW + gap, colorA: '#1e293b', colorB: '#334155', border: 'rgba(148,163,184,0.45)' },
     ];
     resultButtonRects = {
       retry: { x: startX, y, w: btnW, h: btnH },
@@ -4875,30 +4732,28 @@
     ctx.fillStyle = '#f87171';
     ctx.shadowColor = '#f87171';
     ctx.shadowBlur  = 20;
-    ctx.fillText(getElapsedSeconds() > timeLimitSeconds ? '⏰ 時間耗盡！' : '💥 挑戰失敗！', W / 2, centerY - 52);
+    ctx.fillText(getElapsedSeconds() > timeLimitSeconds ? 'Time is up!' : 'Challenge failed!', W / 2, centerY - 52);
 
     // 績效
     ctx.font = '700 32px JetBrains Mono, monospace';
     ctx.fillStyle = '#e8f0fe';
     ctx.shadowBlur = 0;
-    ctx.fillText(`闖關分數：${getFinalScore()}`, W / 2, centerY + 18);
+    ctx.fillText(`Score: ${getFinalScore()}`, W / 2, centerY + 18);
 
     if (mouseOnlyRun) {
       ctx.font = '700 16px Inter, sans-serif';
       ctx.fillStyle = '#4ade80';
-      ctx.fillText('滑鼠操控加成 1.3x', W / 2, centerY + 50);
+      ctx.fillText('Mouse-only bonus ×1.3', W / 2, centerY + 50);
     }
-    const eduBottom = drawEducationResult(W, centerY + 74);
-    const tableBottom = drawResultTable(W, eduBottom + 18);
+    const tableBottom = drawResultTable(W, centerY + 74);
 
-    // 方向提示
     const tip = getElapsedSeconds() > timeLimitSeconds
-      ? '時間拖太久了，試著更早衝過終點'
-      : isDangerAbove ? '貼線太近了，滑鼠往下讓角色降一點 🖱️↓' : '離路線太遠了，滑鼠往上把節奏拉回來 🖱️↑';
+      ? 'Ran out of time — try finishing the run sooner'
+      : isDangerAbove ? 'Too close to the line. Scroll down to lower the rider. 🖱️↓' : 'Too far from the line. Scroll up to recover the rhythm. 🖱️↑';
     ctx.font = '400 16px Inter, sans-serif';
     ctx.fillStyle = 'rgba(148,163,184,0.8)';
     ctx.fillText(tip, W / 2, tableBottom + 30);
-    drawResultButtons(W, tableBottom + 56, '再挑戰');
+    drawResultButtons(W, tableBottom + 56, 'Retry');
 
     ctx.restore();
   }
@@ -4918,17 +4773,17 @@
     ctx.fillStyle = '#4ade80';
     ctx.shadowColor = '#4ade80';
     ctx.shadowBlur  = 25;
-    ctx.fillText('闖關成功！', W / 2, centerY - 34);
+    ctx.fillText('Run Complete!', W / 2, centerY - 34);
 
     ctx.font = '700 32px JetBrains Mono, monospace';
     ctx.fillStyle = '#fde68a';
     ctx.shadowBlur = 0;
-    ctx.fillText(`總分：${getFinalScore()}`, W / 2, centerY + 34);
+    ctx.fillText(`Total: ${getFinalScore()}`, W / 2, centerY + 34);
 
     if (mouseOnlyRun) {
       ctx.font = '700 16px Inter, sans-serif';
       ctx.fillStyle = '#4ade80';
-      ctx.fillText('滑鼠操控加成 1.3x', W / 2, centerY + 66);
+      ctx.fillText('Mouse-only bonus ×1.3', W / 2, centerY + 66);
     }
 
     const rating = getExecutionRating();
@@ -4938,10 +4793,9 @@
 
     ctx.font = '400 16px Inter, sans-serif';
     ctx.fillStyle = 'rgba(148,163,184,0.8)';
-    ctx.fillText(`冒險評級：${rating.summary}`, W / 2, centerY + 146);
-    const eduBottom = drawEducationResult(W, centerY + 168);
-    const tableBottom = drawResultTable(W, eduBottom + 18);
-    drawResultButtons(W, tableBottom + 26, '再挑戰');
+    ctx.fillText(`Run Rating: ${rating.summary}`, W / 2, centerY + 146);
+    const tableBottom = drawResultTable(W, centerY + 168);
+    drawResultButtons(W, tableBottom + 26, 'Retry');
 
     ctx.restore();
   }

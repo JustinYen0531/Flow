@@ -1,17 +1,15 @@
 /* ═══════════════════════════════════════════════════════════════
-   levels.js — Flow：以代碼為種子的地形產生器
-   蒸餾後取代原本由後端 Yahoo Finance 提供的即時資料。
-   任何代碼（NVDA、TSLA、2330.TW、售票亭任意輸入…）
-   都會以該代碼字串為種子，產生一條穩定可重現的滑雪地形。
+   levels.js — Flow: ticker-seeded terrain generator
+   Any ticker (NVDA, TSLA, 2330.TW, …) produces a stable,
+   reproducible ski terrain seeded from that ticker string.
 
-   主要 API（給 lobby.js 用）：
+   Public API (consumed by lobby.js):
      • window.SkiLevels.buildGameData(symbol, period) → currentGameData
-     • window.SkiLevels.homepageRecommendationData   → 首頁推薦（featured/hot）
+     • window.SkiLevels.homepageRecommendationData   → featured/hot
    ═══════════════════════════════════════════════════════════════ */
 
 (function () {
 
-  /* ── 字串 → 穩定整數種子 ──────────────────────── */
   function _hashSeed(str) {
     let h = 0;
     for (let i = 0; i < (str || '').length; i++) {
@@ -29,7 +27,6 @@
     };
   }
 
-  /* ── 依期間決定資料長度 ───────────────────────── */
   const PERIOD_LENGTH = {
     '1mo': 30, '3mo': 80, '6mo': 130, '1y': 200, '2y': 260,
   };
@@ -45,20 +42,19 @@
     return out;
   }
 
-  /* ── 核心地形產生器：組合多個波形 ─────────────── */
   function _generateCloses(symbol, period) {
     const seed = _hashSeed(symbol + '|' + period);
     const rand = _seededRandom(seed);
     const n = PERIOD_LENGTH[period] || 80;
-    const base = 50 + (seed % 220);                       // 50 ~ 270
-    const drift = (rand() - 0.45) * base * 0.004;         // 長期趨勢
-    const volA = base * (0.010 + rand() * 0.030);         // 波動幅度
-    const volB = base * (0.015 + rand() * 0.040);         // 第二波動
-    const cyc1 = 6 + Math.floor(rand() * 14);             // 週期 1
-    const cyc2 = 16 + Math.floor(rand() * 28);            // 週期 2
+    const base = 50 + (seed % 220);
+    const drift = (rand() - 0.45) * base * 0.004;
+    const volA = base * (0.010 + rand() * 0.030);
+    const volB = base * (0.015 + rand() * 0.040);
+    const cyc1 = 6 + Math.floor(rand() * 14);
+    const cyc2 = 16 + Math.floor(rand() * 28);
     const phase1 = rand() * Math.PI * 2;
     const phase2 = rand() * Math.PI * 2;
-    const shockCount = Math.floor(rand() * 4);            // 跳空次數
+    const shockCount = Math.floor(rand() * 4);
     const shocks = {};
     for (let k = 0; k < shockCount; k++) {
       shocks[Math.floor(rand() * n)] = (rand() - 0.4) * base * 0.18;
@@ -77,32 +73,30 @@
     return closes;
   }
 
-  /* ── 代碼名稱查表（售票亭/主題關卡用的名稱）──── */
   const _NAME_TABLE = {
     AAPL: 'Apple', MSFT: 'Microsoft', GOOGL: 'Google', META: 'Meta',
     AMZN: 'Amazon', NFLX: 'Netflix', NVDA: 'Nvidia', AMD: 'AMD',
     CRM: 'Salesforce', ORCL: 'Oracle', QCOM: 'Qualcomm', INTC: 'Intel',
     AVGO: 'Broadcom', MU: 'Micron', AMAT: 'Applied Materials',
     LRCX: 'Lam Research', TSLA: 'Tesla', RIVN: 'Rivian',
-    LCID: 'Lucid Motors', NIO: '蔚來 NIO', ENPH: 'Enphase', PLUG: 'Plug Power',
+    LCID: 'Lucid Motors', NIO: 'NIO', ENPH: 'Enphase', PLUG: 'Plug Power',
     JPM: 'JPMorgan', BAC: 'Bank of America', GS: 'Goldman Sachs',
     V: 'Visa', MA: 'Mastercard', 'BRK-B': 'Berkshire B',
     XOM: 'ExxonMobil', CVX: 'Chevron', COP: 'ConocoPhillips',
-    GLD: '黃金 ETF', SLV: '白銀 ETF',
-    BABA: '阿里巴巴', PDD: '拼多多', JD: '京東', BIDU: '百度',
-    '2330.TW': '台積電', '2317.TW': '鴻海', '2454.TW': '聯發科',
-    '2303.TW': '聯電', '2308.TW': '台達電', '3711.TW': '日月光',
-    '2382.TW': '廣達', '2395.TW': '研華',
-    '0050.TW': '台灣50', '0056.TW': '高股息',
-    '006208.TW': '富邦台50', '00878.TW': '國泰永續高股息',
-    '00919.TW': '群益高息', '00929.TW': '復華科技優息',
+    GLD: 'Gold ETF', SLV: 'Silver ETF',
+    BABA: 'Alibaba', PDD: 'PDD Holdings', JD: 'JD.com', BIDU: 'Baidu',
+    '2330.TW': 'TSMC', '2317.TW': 'Foxconn', '2454.TW': 'MediaTek',
+    '2303.TW': 'UMC', '2308.TW': 'Delta Electronics', '3711.TW': 'ASE Group',
+    '2382.TW': 'Quanta', '2395.TW': 'Advantech',
+    '0050.TW': 'Taiwan 50', '0056.TW': 'High Dividend',
+    '006208.TW': 'Fubon Taiwan 50', '00878.TW': 'Cathay ESG High Div',
+    '00919.TW': 'Group Benefits High Yield', '00929.TW': 'FSIT Tech Dividend',
   };
 
   function _nameOf(symbol) {
     return _NAME_TABLE[symbol] || symbol;
   }
 
-  /* ── 主題色（與 lobby.js 的 _getSymbolTheme 一致）── */
   function _themeColors(symbol) {
     const palette = [
       ['#00cfaa', '#0080c0'], ['#ff7043', '#d32f2f'],
@@ -115,61 +109,6 @@
     return palette[idx % palette.length];
   }
 
-  /* ── 滑雪技巧題 ─────────────────────────────── */
-  function _skiEducation(symbol) {
-    const name = _nameOf(symbol);
-    return {
-      symbol,
-      preview: {
-        headline: `${symbol} · 纜車預習`,
-        summary: `出發前先掌握滑雪基礎：視線、重心、速度控制與地形判讀。`,
-        folders: [],
-      },
-      nodes: [
-        {
-          title: '第一站：視線與預判',
-          type: 'history',
-          summary: '視線看遠一點，提早判讀下一段地形，比盯著腳下更能避免失誤。',
-          bullets: ['視線放在前方 2~3 個地形點，提前轉向。',
-                    '盯著腳下會反應不及，容易脫線。',
-                    '預判坡度變化，提前調整重心。'],
-          question: '滑雪時視線應該放在哪裡？',
-          choices: ['前方遠處的地形', '自己的滑雪板', '只看正下方一點', '閉眼憑感覺'],
-          answerIndex: 0,
-          explanation: '看遠方能提早反應，是穩定滑行的第一步。',
-          sourceKind: 'curated',
-        },
-        {
-          title: '第二站：重心與速度',
-          type: 'volatility',
-          summary: '下坡時重心微微前壓可以穩定控制速度，後仰則容易失控加速。',
-          bullets: ['下坡重心前壓，避免被甩到後面。',
-                    '陡坡放低重心，可吸收地形衝擊。',
-                    '想減速時用邊緣刻雪，而非整個身體後仰。'],
-          question: '遇到陡坡想穩定控制速度，重心應該如何？',
-          choices: ['微微前壓並放低', '盡量往後仰', '完全不彎曲膝蓋', '跳起來避開'],
-          answerIndex: 0,
-          explanation: '前壓重心讓滑雪板邊緣能確實刻雪減速。',
-          sourceKind: 'curated',
-        },
-        {
-          title: '第三站：地形判讀',
-          type: 'technical',
-          summary: `${name} 的雪道路線會隨地形起伏，學會讀坡度轉折，就能順著節奏滑行。`,
-          bullets: ['坡度變陡代表加速區，提前準備減速。',
-                    '急轉彎處需要更主動轉向。',
-                    '平緩段是回氣與調整的好時機。'],
-          question: '看到前方地形突然變陡，最好的反應是？',
-          choices: ['提前準備減速與轉向', '完全不減速直衝', '停下來不敢前進', '閉眼睛'],
-          answerIndex: 0,
-          explanation: '預判陡坡並提前減速，是安全順暢的關鍵。',
-          sourceKind: 'curated',
-        },
-      ],
-    };
-  }
-
-  /* ── 組裝完整遊戲資料（= currentGameData）──────── */
   function buildGameData(symbol, period) {
     symbol = (symbol || '').trim().toUpperCase() || 'NVDA';
     period = period || '3mo';
@@ -179,22 +118,20 @@
       closes,
       dates: _genDates(closes.length),
       period,
-      education: _skiEducation(symbol),
     };
   }
 
-  /* ── 推薦區資料（餵給 lobby.js 的 homepageRecommendationData）── */
   const _REC_POOL = [
-    { sym: 'NVDA', name: 'Nvidia', blurb: 'AI GPU 算力核心，地形起伏劇烈，挑戰性十足' },
-    { sym: 'TSLA', name: 'Tesla', blurb: '電動車龍頭，劇烈震盪地形，反應要快' },
-    { sym: 'AAPL', name: 'Apple', blurb: '穩健長坡，適合練習基本節奏' },
-    { sym: 'AMD',  name: 'AMD',    blurb: '挑戰者曲線，轉折多、節奏快' },
-    { sym: 'META', name: 'Meta',   blurb: '社群廣告巨頭，雙峰地形考驗轉換' },
-    { sym: 'AMZN', name: 'Amazon', blurb: '電商雙引擎，階梯式地形' },
-    { sym: 'MSFT', name: 'Microsoft', blurb: '雲端穩定上坡，速度漸快' },
-    { sym: 'GOOGL', name: 'Google', blurb: '搜尋霸主，V 型反轉地形' },
-    { sym: '2330.TW', name: '台積電', blurb: '晶圓代工霸主，長坡道穩定推進' },
-    { sym: 'AVGO', name: 'Broadcom', blurb: '網路晶片霸主，鋸齒地形密集' },
+    { sym: 'NVDA',    name: 'Nvidia',    blurb: 'AI GPU compute core — intense, technical terrain that demands quick reflexes' },
+    { sym: 'TSLA',    name: 'Tesla',     blurb: 'EV leader — wild swings and sharp drops, stay on your toes' },
+    { sym: 'AAPL',    name: 'Apple',     blurb: 'Steady long slope — perfect for drilling fundamental rhythm' },
+    { sym: 'AMD',     name: 'AMD',       blurb: 'Challenger curve — lots of turns, fast tempo' },
+    { sym: 'META',    name: 'Meta',      blurb: 'Social ad giant — twin-peak terrain tests your transitions' },
+    { sym: 'AMZN',    name: 'Amazon',    blurb: 'Dual-engine e-commerce — step-ladder terrain' },
+    { sym: 'MSFT',    name: 'Microsoft', blurb: 'Steady cloud uphill — pace builds gradually' },
+    { sym: 'GOOGL',   name: 'Google',    blurb: 'Search giant — V-shaped reversal terrain' },
+    { sym: '2330.TW', name: 'TSMC',      blurb: 'Wafer foundry champion — long, stable slope that builds momentum' },
+    { sym: 'AVGO',    name: 'Broadcom',  blurb: 'Network chip king — dense sawtooth terrain' },
   ];
 
   function _pctChange(closes) {
@@ -214,7 +151,6 @@
   }
 
   function _buildFeatured() {
-    // 每日關卡：以「今天日期」選一檔，確保當天穩定
     const today = new Date();
     const dayKey = today.getFullYear() * 1000 + today.getMonth() * 32 + today.getDate();
     const pick = _REC_POOL[dayKey % _REC_POOL.length];
@@ -222,18 +158,18 @@
     const p = _pctChange(closes);
     const tone = _chipTone(p);
     const chips = [
-      { label: tone === 'up' ? '強勢上坡' : tone === 'down' ? '下坡警報' : '橫向盤整', tone },
-      { label: '高波動', tone: p < 0 ? 'down' : 'up' },
-      { label: '熱門雪場', tone: 'up' },
+      { label: tone === 'up' ? 'Strong Uphill' : tone === 'down' ? 'Downhill Alert' : 'Sideways Chop', tone },
+      { label: 'High Volatility', tone: p < 0 ? 'down' : 'up' },
+      { label: 'Featured Resort', tone: 'up' },
     ];
     return {
       symbol: pick.sym,
       name: pick.name,
-      summary: pick.blurb + '。完成本關卡可獲得每日通關勳章！',
+      summary: pick.blurb + '. Complete this quest to earn the daily clear medal!',
       detail: pick.blurb,
       series: closes,
       chips,
-      reasons: ['全程不脫線', '纜車題目全對', '滑雪評級達 A 以上'],
+      reasons: ['Stay on course the whole run', 'Keep your rhythm through the terrain', 'Earn a ski rating of A or above'],
     };
   }
 
@@ -257,7 +193,6 @@
     hot: _buildHot(),
   };
 
-  /* ── 暴露到全域 ──────────────────────────────── */
   window.SkiLevels = {
     buildGameData,
     homepageRecommendationData,

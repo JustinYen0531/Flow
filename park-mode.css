@@ -3518,3 +3518,303 @@ body.park-mode .park-quest-modal-content {
     padding: 1.15rem !important;
   }
 }
+
+body.park-mode #parkPreviewPage {
+  position: relative;
+  z-index: 10;
+  min-height: calc(100vh - 2rem);
+  width: 100%;
+  padding: clamp(1.2rem, 3vw, 2.4rem);
+}
+
+body.park-mode .park-preview-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  position: relative;
+}
+
+body.park-mode .park-preview-back {
+  appearance: none;
+  position: relative;
+  z-index: 2;
+  margin: 0 0 0.9rem;
+  padding: 0.58rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245, 245, 245, 0.76);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+body.park-mode .park-preview-card {
+  position: relative;
+  overflow: hidden;
+  min-height: min(760px, calc(100vh - 6rem));
+  padding: clamp(1.5rem, 4vw, 3.1rem);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015) 16%, rgba(0,0,0,0.16)),
+    #080808;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.42);
+}
+
+body.park-mode .park-preview-card::before,
+body.park-mode .park-preview-card::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+body.park-mode .park-preview-card::before {
+  inset: 0;
+  background:
+    linear-gradient(110deg, transparent 0 22%, rgba(255,255,255,0.035) 22% 23%, transparent 23% 100%),
+    linear-gradient(72deg, transparent 0 64%, rgba(255,255,255,0.04) 64% 65%, transparent 65% 100%);
+  opacity: 0.8;
+}
+
+body.park-mode .park-preview-card::after {
+  left: -5%;
+  right: -5%;
+  bottom: -1px;
+  height: 22%;
+  background:
+    linear-gradient(155deg, transparent 0 14%, rgba(255,255,255,0.12) 14% 24%, transparent 24% 100%),
+    linear-gradient(25deg, transparent 0 58%, rgba(255,255,255,0.1) 58% 69%, transparent 69% 100%),
+    linear-gradient(180deg, transparent, rgba(255,255,255,0.12));
+  opacity: 0.5;
+}
+
+body.park-mode .park-preview-kicker {
+  position: relative;
+  z-index: 1;
+  width: calc(100% + clamp(3rem, 8vw, 6.2rem));
+  margin: calc(clamp(1.5rem, 4vw, 3.1rem) * -1) calc(clamp(1.5rem, 4vw, 3.1rem) * -1) clamp(2rem, 4vw, 3rem);
+  padding: 0.78rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.11);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245,245,245,0.66);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+}
+
+body.park-mode .park-preview-bg-line {
+  position: absolute;
+  inset: 19% -2rem auto -2rem;
+  height: 44%;
+  opacity: 0.28;
+  background:
+    linear-gradient(166deg, transparent 0 25%, rgba(255,255,255,0.1) 25.2% 26%, transparent 26.2% 100%),
+    linear-gradient(14deg, transparent 0 44%, rgba(255,255,255,0.13) 44.2% 45%, transparent 45.2% 100%);
+}
+
+body.park-mode .park-preview-title-row,
+body.park-mode .park-preview-grid,
+body.park-mode .park-preview-actions,
+body.park-mode .park-preview-terrain {
+  position: relative;
+  z-index: 1;
+}
+
+body.park-mode .park-preview-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin: 0 auto;
+  width: min(860px, 100%);
+}
+
+body.park-mode .park-preview-symbol {
+  color: rgba(255,255,255,0.42);
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+body.park-mode .park-preview-title {
+  margin: 0.28rem 0 0;
+  color: #f8f8f8;
+  font-size: clamp(2.4rem, 6vw, 4.9rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+body.park-mode .park-preview-subtitle {
+  margin-top: 1rem;
+  max-width: 42rem;
+  color: rgba(245,245,245,0.58);
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  line-height: 1.65;
+}
+
+body.park-mode .park-preview-pill {
+  flex: 0 0 auto;
+  margin-top: 0.4rem;
+  padding: 0.42rem 0.72rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.26);
+  color: rgba(245,245,245,0.78);
+  font-size: 0.78rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+}
+
+body.park-mode .park-preview-terrain {
+  width: min(960px, 100%);
+  height: clamp(130px, 20vw, 190px);
+  margin: clamp(1.6rem, 4vw, 3rem) auto 0;
+}
+
+body.park-mode #parkPreviewSparkline {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+body.park-mode .park-preview-line,
+body.park-mode .park-preview-line-shadow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.park-mode .park-preview-line-shadow {
+  stroke: rgba(255,255,255,0.14);
+  stroke-width: 14;
+}
+
+body.park-mode .park-preview-line {
+  stroke: rgba(245,245,245,0.62);
+  stroke-width: 5;
+}
+
+body.park-mode .park-preview-baseline {
+  stroke: rgba(255,255,255,0.11);
+  stroke-width: 2;
+}
+
+body.park-mode .park-preview-grid {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.9fr) minmax(16rem, 1.3fr) minmax(12rem, 0.9fr);
+  gap: 1rem;
+  width: min(980px, 100%);
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+body.park-mode .park-preview-stat,
+body.park-mode .park-preview-difficulty {
+  min-height: 6.6rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.13);
+  background: rgba(255,255,255,0.045);
+}
+
+body.park-mode .park-preview-stat span,
+body.park-mode .park-preview-difficulty span {
+  display: block;
+  color: rgba(245,245,245,0.48);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+body.park-mode .park-preview-stat strong,
+body.park-mode .park-preview-difficulty strong {
+  display: block;
+  margin-top: 0.55rem;
+  color: #f5f5f5;
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 3vw, 2.55rem);
+  line-height: 1;
+}
+
+body.park-mode .park-preview-difficulty strong {
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+}
+
+body.park-mode .park-preview-difficulty small {
+  display: block;
+  margin-top: 0.5rem;
+  color: rgba(245,245,245,0.5);
+  font-size: 0.85rem;
+}
+
+body.park-mode .park-preview-stat-wide {
+  grid-column: span 1;
+}
+
+body.park-mode .park-preview-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: clamp(1.8rem, 5vw, 3.6rem) auto 0;
+}
+
+body.park-mode .park-preview-start,
+body.park-mode .park-preview-secondary {
+  appearance: none;
+  border-radius: 18px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+body.park-mode .park-preview-start {
+  min-width: min(100%, 28rem);
+  min-height: 5.4rem;
+  padding: 1.25rem 2rem;
+  border: 1px solid #f5f5f5;
+  background: #f5f5f5;
+  color: #080808;
+  font-size: clamp(1.45rem, 4vw, 2.35rem);
+  letter-spacing: 0.02em;
+}
+
+body.park-mode .park-preview-secondary {
+  min-height: 3.1rem;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: rgba(245,245,245,0.72);
+  font-size: 0.85rem;
+}
+
+body.park-mode .park-preview-start:hover,
+body.park-mode .park-preview-secondary:hover,
+body.park-mode .park-preview-back:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.42);
+}
+
+@media (max-width: 840px) {
+  body.park-mode .park-preview-card {
+    min-height: 0;
+  }
+
+  body.park-mode .park-preview-title-row {
+    flex-direction: column;
+  }
+
+  body.park-mode .park-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.park-mode .park-preview-start {
+    min-height: 4.5rem;
+  }
+}

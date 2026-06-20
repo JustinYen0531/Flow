@@ -1,17 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
-   lobby.js — Flow 大廳互動
-   原樣移植自原 index.html 內嵌的 park-mode script，只做兩處改動：
-     1. parkStartAdventure / parkLoadSymbol 不再呼叫後端 loadStock()，
-        改用 SkiLevels.buildGameData(symbol) 生成地形，並啟動滑雪遊戲。
-     2. homepageRecommendationData 改由 levels.js 內建提供。
-   其餘（_PARK_THEME_DEFS / _PARK_STOCKS / buildPark* / picker /
-        quest modal / profile / 飄雪）全部原樣保留。
+   lobby.js — Flow lobby interactions
    ═══════════════════════════════════════════════════════════════ */
 
-/* ════════════ 0. 內建推薦資料（取代後端） ════════════ */
+/* ════════════ 0. Built-in recommendation data ════════════ */
 const homepageRecommendationData = window.SkiLevels.homepageRecommendationData;
 
-/* ════════════ 1. 通用工具（原樣保留） ════════════ */
+/* ════════════ 1. Utilities ════════════ */
 function _escHtml(str) {
   return String(str ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -38,7 +32,7 @@ function _getSymbolTheme(sym) {
   return palette[idx % palette.length];
 }
 
-/* ════════════ 2. 迷你折線 SVG（原樣保留） ════════════ */
+/* ════════════ 2. Mini sparkline SVG ════════════ */
 function _buildSparklineSvg(series) {
   if (!series || series.length < 2) return '';
   const vals = series.map(Number).filter(v => !isNaN(v));
@@ -60,10 +54,10 @@ function _buildSparklineSvg(series) {
   </svg>`;
 }
 
-/* ════════════ 3. 推薦區建構（原樣保留） ════════════ */
+/* ════════════ 3. Recommendation builders ════════════ */
 function buildParkDailyQuest() {
   const f = homepageRecommendationData?.featured;
-  if (!f) return `<div class="park-rec-loading">今日關卡準備中，請稍候...</div>`;
+  if (!f) return `<div class="park-rec-loading">Today's quest loading, please wait...</div>`;
   const chips = (f.chips || []).map(c =>
     `<span class="park-quest-chip ${_escHtml(c.tone || '')}">${_escHtml(c.label)}</span>`
   ).join('');
@@ -99,18 +93,18 @@ function buildParkDailyQuest() {
         <p class="park-daily-summary">${_escHtml(f.summary || f.detail || '')}</p>
         <div class="park-daily-chips">${chips}</div>
         <div>
-          <span class="park-victory-label">勝利條件</span>
+          <span class="park-victory-label">Victory Conditions</span>
           <div class="park-victory-list">${reasons}</div>
         </div>
       </div>
       <div class="park-daily-right">
         <div>
-          <div class="park-daily-diff-label">關卡難度</div>
+          <div class="park-daily-diff-label">Stage Difficulty</div>
           <div class="park-daily-stars">${difficultyLabel}</div>
         </div>
         <button class="park-daily-btn"
           onclick="event.stopPropagation();parkLoadSymbol('${_escHtml(f.symbol)}')">
-          進入今日關卡
+          Enter Today's Quest
         </button>
       </div>
     </div>`;
@@ -118,7 +112,7 @@ function buildParkDailyQuest() {
 
 function buildParkHotQuests() {
   const list = homepageRecommendationData?.hot || [];
-  if (!list.length) return `<div class="park-rec-loading">熱門關卡同步中...</div>`;
+  if (!list.length) return `<div class="park-rec-loading">Syncing hot quests...</div>`;
   const rankCls = ['rank-1', 'rank-2', 'rank-3', 'rank-4'];
   return list.slice(0, 4).map((item, i) => `
     <div class="park-hot-card ${item.trend === 'down' ? 'is-down' : 'is-up'}"
@@ -132,59 +126,59 @@ function buildParkHotQuests() {
       <p class="park-hot-blurb">${_escHtml(item.blurb || '')}</p>
       <button class="park-hot-btn"
         onclick="event.stopPropagation();parkLoadSymbol('${_escHtml(item.symbol)}')">
-        挑戰
+        Challenge
       </button>
     </div>`).join('');
 }
 
-/* ════════════ 4. 主題關卡定義（原樣保留） ════════════ */
+/* ════════════ 4. Theme stage definitions ════════════ */
 const _PARK_THEME_DEFS = [
   {
-    id: 'ai_chip', title: 'AI 晶片', icon: 'chip',
-    desc: '聚焦算力與伺服器 GPU 主線，探索 AI 晶片供應鏈從設計到封裝的完整生態。',
+    id: 'ai_chip', title: 'AI Chips', icon: 'chip',
+    desc: 'Focused on compute and GPU server infrastructure — explore the full AI chip supply chain from design to packaging.',
     stages: [
-      { sym: 'NVDA',    name: 'Nvidia',   disp: 'NVDA', desc: 'AI GPU 算力核心，全球市場領頭羊' },
-      { sym: 'AMD',     name: 'AMD',      disp: 'AMD',  desc: '挑戰 Nvidia 的 AI 加速晶片新秀' },
-      { sym: '2454.TW', name: '聯發科',   disp: '2454', desc: '台灣 IC 設計龍頭，端側 AI 芯片佈局' },
-      { sym: 'AVGO',    name: 'Broadcom', disp: 'AVGO', desc: 'AI 網路晶片與客製化 ASIC 霸主' },
-      { sym: 'QCOM',    name: 'Qualcomm', disp: 'QCOM', desc: 'Snapdragon 平台端側 AI 推理先鋒' },
-      { sym: 'INTC',    name: 'Intel',    disp: 'INTC', desc: 'Gaudi AI 加速卡，老將的強力反攻' },
+      { sym: 'NVDA',    name: 'Nvidia',    disp: 'NVDA', desc: 'The AI GPU compute core — global market leader' },
+      { sym: 'AMD',     name: 'AMD',       disp: 'AMD',  desc: 'Rising challenger to Nvidia in AI accelerator chips' },
+      { sym: '2454.TW', name: 'MediaTek',  disp: '2454', desc: 'Taiwan\'s top IC design house — edge AI chip strategy' },
+      { sym: 'AVGO',    name: 'Broadcom',  disp: 'AVGO', desc: 'Dominant in AI networking chips and custom ASICs' },
+      { sym: 'QCOM',    name: 'Qualcomm',  disp: 'QCOM', desc: 'Snapdragon platform pioneer in on-device AI inference' },
+      { sym: 'INTC',    name: 'Intel',     disp: 'INTC', desc: 'Gaudi AI accelerator — the veteran\'s strong comeback' },
     ]
   },
   {
-    id: 'us_tech', title: '美股科技', icon: 'tech',
-    desc: '從 FAANG 到 AI 轉型股，逐一解鎖美國科技龍頭的核心競爭力。',
+    id: 'us_tech', title: 'US Tech', icon: 'tech',
+    desc: 'From FAANG to AI transformation stocks — unlock the core competitiveness of America\'s tech giants one by one.',
     stages: [
-      { sym: 'AAPL',  name: 'Apple',     disp: 'AAPL',  desc: '消費電子生態護城河，Apple Intelligence 押注' },
-      { sym: 'MSFT',  name: 'Microsoft', disp: 'MSFT',  desc: 'Azure 雲端 + Copilot AI，企業軟體王者' },
-      { sym: 'GOOGL', name: 'Google',    disp: 'GOOGL', desc: '搜尋廣告霸主，Gemini AI 強力迎戰' },
-      { sym: 'META',  name: 'Meta',      disp: 'META',  desc: '社群廣告巨頭，Llama AI + AR 眼鏡' },
-      { sym: 'AMZN',  name: 'Amazon',    disp: 'AMZN',  desc: '電商 + AWS 雲端雙引擎，AI 全面佈局' },
-      { sym: 'NFLX',  name: 'Netflix',   disp: 'NFLX',  desc: '串流媒體獲利轉型先驅，廣告層加速成長' },
+      { sym: 'AAPL',  name: 'Apple',     disp: 'AAPL',  desc: 'Consumer electronics moat — bet on Apple Intelligence' },
+      { sym: 'MSFT',  name: 'Microsoft', disp: 'MSFT',  desc: 'Azure cloud + Copilot AI — king of enterprise software' },
+      { sym: 'GOOGL', name: 'Google',    disp: 'GOOGL', desc: 'Search ad dominance — Gemini AI fighting back strong' },
+      { sym: 'META',  name: 'Meta',      disp: 'META',  desc: 'Social ad giant — Llama AI + AR glasses' },
+      { sym: 'AMZN',  name: 'Amazon',    disp: 'AMZN',  desc: 'E-commerce + AWS dual engine — full-spectrum AI' },
+      { sym: 'NFLX',  name: 'Netflix',   disp: 'NFLX',  desc: 'Streaming profitability leader — ad tier accelerating' },
     ]
   },
   {
-    id: 'tw_dragon', title: '台灣龍頭', icon: 'tw',
-    desc: '台灣半導體護城河，從晶圓代工到 AI 伺服器供應鏈全面制霸。',
+    id: 'tw_dragon', title: 'Taiwan Leaders', icon: 'tw',
+    desc: 'Taiwan\'s semiconductor moat — dominating from wafer foundry to AI server supply chain.',
     stages: [
-      { sym: '2330.TW', name: '台積電', disp: '2330', desc: '全球晶圓代工霸主，先進製程護城河無人能敵' },
-      { sym: '2454.TW', name: '聯發科', disp: '2454', desc: 'IC 設計台灣第一，AI 手機芯片全球佈局' },
-      { sym: '2317.TW', name: '鴻海',   disp: '2317', desc: 'AI 伺服器代工最大受惠者，GB200 組裝' },
-      { sym: '3711.TW', name: '日月光', disp: '3711', desc: 'CoWoS 先進封裝 AI 關鍵卡位，毛利持續提升' },
-      { sym: '2308.TW', name: '台達電', disp: '2308', desc: 'AI 伺服器電源管理核心，綠能轉型受惠' },
-      { sym: '2382.TW', name: '廣達',   disp: '2382', desc: 'AI 伺服器 ODM 出貨量龍頭，GB200 大單' },
+      { sym: '2330.TW', name: 'TSMC',              disp: '2330', desc: 'Global wafer foundry champion — unrivaled advanced process moat' },
+      { sym: '2454.TW', name: 'MediaTek',           disp: '2454', desc: 'Taiwan\'s #1 IC design house — AI mobile chip global push' },
+      { sym: '2317.TW', name: 'Foxconn',            disp: '2317', desc: 'Biggest beneficiary of AI server assembly — GB200 contracts' },
+      { sym: '3711.TW', name: 'ASE Group',          disp: '3711', desc: 'CoWoS advanced packaging — key AI position, rising margins' },
+      { sym: '2308.TW', name: 'Delta Electronics',  disp: '2308', desc: 'AI server power management core — green energy transition' },
+      { sym: '2382.TW', name: 'Quanta',             disp: '2382', desc: 'AI server ODM shipment leader — major GB200 orders' },
     ]
   },
   {
-    id: 'ev', title: '電動車', icon: 'ev',
-    desc: '最能反映市場情緒起伏的題材，從領頭羊到新能源全面解鎖。',
+    id: 'ev', title: 'EVs', icon: 'ev',
+    desc: 'The most sentiment-driven sector — unlock everything from EV leaders to new energy.',
     stages: [
-      { sym: 'TSLA', name: 'Tesla',      disp: 'TSLA', desc: '電動車龍頭，FSD 自動駕駛 + Robotaxi 催化' },
-      { sym: 'RIVN', name: 'Rivian',     disp: 'RIVN', desc: '亞馬遜背書的電動皮卡新星，R2 量產在即' },
-      { sym: 'NIO',  name: '蔚來 NIO',  disp: 'NIO',  desc: '中國高端電動車領導品牌，換電模式差異化' },
-      { sym: 'LCID', name: 'Lucid',      disp: 'LCID', desc: '豪華電動車長航程技術，沙烏地資本加持' },
-      { sym: 'ENPH', name: 'Enphase',    disp: 'ENPH', desc: '家用太陽能逆變器龍頭，儲能業務高速成長' },
-      { sym: 'PLUG', name: 'Plug Power', disp: 'PLUG', desc: '氫能燃料電池先驅，綠氫佈局長線題材' },
+      { sym: 'TSLA', name: 'Tesla',      disp: 'TSLA', desc: 'EV leader — FSD self-driving + Robotaxi catalyst' },
+      { sym: 'RIVN', name: 'Rivian',     disp: 'RIVN', desc: 'Amazon-backed electric pickup star — R2 production imminent' },
+      { sym: 'NIO',  name: 'NIO',        disp: 'NIO',  desc: 'China\'s premium EV brand — battery-swap differentiation' },
+      { sym: 'LCID', name: 'Lucid',      disp: 'LCID', desc: 'Luxury EV long-range tech — Saudi capital backing' },
+      { sym: 'ENPH', name: 'Enphase',    disp: 'ENPH', desc: 'Home solar inverter leader — energy storage growth' },
+      { sym: 'PLUG', name: 'Plug Power', disp: 'PLUG', desc: 'Hydrogen fuel cell pioneer — green hydrogen long-term play' },
     ]
   },
 ];
@@ -209,11 +203,11 @@ function buildParkThemeQuests() {
         <div class="park-theme-prog-bar">
           <div class="park-theme-prog-fill" style="width:${pct}%"></div>
         </div>
-        <div class="park-theme-prog-label">${done}/${total} 關卡${allDone ? ' · 全部通關！' : ''}</div>
+        <div class="park-theme-prog-label">${done}/${total} stages${allDone ? ' · All Clear!' : ''}</div>
         <div class="park-theme-picks">${picks}</div>
         <button class="park-theme-btn"
           onclick="event.stopPropagation();openThemeQuest(${idx})">
-          探索關卡
+          Explore
         </button>
       </div>`;
   }).join('');
@@ -228,7 +222,7 @@ function renderParkRecommendations() {
   if (t) t.innerHTML = buildParkThemeQuests();
 }
 
-/* ════════════ 5. 主題任務 Modal（原樣保留） ════════════ */
+/* ════════════ 5. Theme quest modal ════════════ */
 let _activeThemeIdx = null;
 
 function openThemeQuest(idx) {
@@ -260,17 +254,16 @@ function _buildQuestModal(idx) {
   const stagesHtml = theme.stages.map((s, i) => {
     const isDone = visitedSyms.has(s.sym);
     const isActive = !isDone && (i === 0 || visitedSyms.has(theme.stages[i - 1].sym));
-    const isLocked = !isDone && !isActive;
     const cls = isDone ? 'done' : isActive ? 'active' : 'locked';
     const ind = isDone ? 'Done' : isActive ? 'Next' : 'Lock';
     const action = isDone
-      ? `<span class="park-quest-stage-done-label">已完成</span>`
+      ? `<span class="park-quest-stage-done-label">Completed</span>`
       : isActive
         ? `<button class="park-quest-stage-btn"
              onclick="_enterThemeStage('${_escHtml(s.sym)}','${_escHtml(s.name)}',${idx})">
-             進入關卡
+             Enter Stage
            </button>`
-        : `<span class="park-quest-stage-locked-label">請先完成上一關</span>`;
+        : `<span class="park-quest-stage-locked-label">Complete the previous stage first</span>`;
     const connector = i < theme.stages.length - 1
       ? `<div class="park-quest-connector"></div>` : '';
     return `
@@ -283,7 +276,7 @@ function _buildQuestModal(idx) {
           <div class="park-quest-stage-header">
             <span class="park-quest-stage-sym">${_escHtml(s.disp || s.sym)}</span>
             <span class="park-quest-stage-name">${_escHtml(s.name)}</span>
-            <span class="park-quest-stage-num">第 ${i + 1} 關</span>
+            <span class="park-quest-stage-num">Stage ${i + 1}</span>
           </div>
           <div class="park-quest-stage-desc">${_escHtml(s.desc)}</div>
           <div class="park-quest-stage-action">${action}</div>
@@ -293,14 +286,14 @@ function _buildQuestModal(idx) {
 
   const completeBanner = allDone
     ? `<div class="park-quest-complete-banner">
-         恭喜完成「${_escHtml(theme.title)}」主題全 ${total} 關！獲得專屬勳章
+         Congratulations! All ${total} stages of "${_escHtml(theme.title)}" complete — exclusive medal earned!
        </div>` : '';
 
   document.getElementById('parkQuestModalContent').innerHTML = `
     <div class="park-quest-modal-header">
       <div class="park-quest-modal-icon">${_parkHtmlIcon(theme.icon)}</div>
       <div>
-        <div class="park-quest-modal-title">${_escHtml(theme.title)} 主題關卡</div>
+        <div class="park-quest-modal-title">${_escHtml(theme.title)} Theme Stages</div>
         <div class="park-quest-modal-desc">${_escHtml(theme.desc)}</div>
       </div>
       <button class="park-quest-modal-close" onclick="closeThemeQuest()">X</button>
@@ -309,7 +302,7 @@ function _buildQuestModal(idx) {
       <div class="park-quest-prog-bar">
         <div class="park-quest-prog-fill" style="width:${pct}%"></div>
       </div>
-      <div class="park-quest-prog-label">${done} / ${total} 關卡完成 · ${pct}%</div>
+      <div class="park-quest-prog-label">${done} / ${total} stages complete · ${pct}%</div>
     </div>
     ${completeBanner}
     <div class="park-quest-stage-list">${stagesHtml}</div>`;
@@ -322,58 +315,60 @@ function _enterThemeStage(sym, name, themeIdx) {
   parkLoadSymbol(sym, name);
 }
 
-/* ════════════ 6. 售票亭選股面板（原樣保留） ════════════ */
+/* ════════════ 6. Resort picker panel ════════════ */
 const _PARK_STOCKS = [
-  { cat: '美國科技', stocks: [
+  { cat: 'US Tech', stocks: [
     { sym: 'AAPL', name: 'Apple' }, { sym: 'MSFT', name: 'Microsoft' },
     { sym: 'GOOGL', name: 'Google' }, { sym: 'META', name: 'Meta' },
     { sym: 'AMZN', name: 'Amazon' }, { sym: 'NFLX', name: 'Netflix' },
     { sym: 'NVDA', name: 'Nvidia' }, { sym: 'AMD', name: 'AMD' },
     { sym: 'CRM', name: 'Salesforce' }, { sym: 'ORCL', name: 'Oracle' },
   ]},
-  { cat: '半導體', stocks: [
+  { cat: 'Semiconductors', stocks: [
     { sym: 'QCOM', name: 'Qualcomm' }, { sym: 'INTC', name: 'Intel' },
     { sym: 'AVGO', name: 'Broadcom' }, { sym: 'MU', name: 'Micron' },
     { sym: 'AMAT', name: 'Applied Materials' }, { sym: 'LRCX', name: 'Lam Research' },
   ]},
-  { cat: '電動車/新能源', stocks: [
+  { cat: 'EVs / Clean Energy', stocks: [
     { sym: 'TSLA', name: 'Tesla' }, { sym: 'RIVN', name: 'Rivian' },
-    { sym: 'LCID', name: 'Lucid Motors' }, { sym: 'NIO', name: '蔚來 NIO' },
+    { sym: 'LCID', name: 'Lucid Motors' }, { sym: 'NIO', name: 'NIO' },
     { sym: 'ENPH', name: 'Enphase' }, { sym: 'PLUG', name: 'Plug Power' },
   ]},
-  { cat: '商務服務', stocks: [
+  { cat: 'Finance & Services', stocks: [
     { sym: 'JPM', name: 'JPMorgan' }, { sym: 'BAC', name: 'Bank of America' },
     { sym: 'GS', name: 'Goldman Sachs' }, { sym: 'V', name: 'Visa' },
     { sym: 'MA', name: 'Mastercard' }, { sym: 'BRK-B', name: 'Berkshire B' },
   ]},
-  { cat: '台灣科技', stocks: [
-    { sym: '2330.TW', name: '台積電', disp: '2330' }, { sym: '2317.TW', name: '鴻海', disp: '2317' },
-    { sym: '2454.TW', name: '聯發科', disp: '2454' }, { sym: '2303.TW', name: '聯電', disp: '2303' },
-    { sym: '2308.TW', name: '台達電', disp: '2308' }, { sym: '3711.TW', name: '日月光', disp: '3711' },
-    { sym: '2382.TW', name: '廣達', disp: '2382' }, { sym: '2395.TW', name: '研華', disp: '2395' },
+  { cat: 'Taiwan Tech', stocks: [
+    { sym: '2330.TW', name: 'TSMC', disp: '2330' }, { sym: '2317.TW', name: 'Foxconn', disp: '2317' },
+    { sym: '2454.TW', name: 'MediaTek', disp: '2454' }, { sym: '2303.TW', name: 'UMC', disp: '2303' },
+    { sym: '2308.TW', name: 'Delta Electronics', disp: '2308' }, { sym: '3711.TW', name: 'ASE Group', disp: '3711' },
+    { sym: '2382.TW', name: 'Quanta', disp: '2382' }, { sym: '2395.TW', name: 'Advantech', disp: '2395' },
   ]},
-  { cat: '台灣 ETF', stocks: [
-    { sym: '0050.TW', name: '台灣50', disp: '0050' }, { sym: '0056.TW', name: '高股息', disp: '0056' },
-    { sym: '006208.TW', name: '富邦台50', disp: '006208' }, { sym: '00878.TW', name: '國泰永續高股息', disp: '00878' },
-    { sym: '00919.TW', name: '群益高息', disp: '00919' }, { sym: '00929.TW', name: '復華科技優息', disp: '00929' },
+  { cat: 'Taiwan ETFs', stocks: [
+    { sym: '0050.TW', name: 'Taiwan 50', disp: '0050' }, { sym: '0056.TW', name: 'High Dividend', disp: '0056' },
+    { sym: '006208.TW', name: 'Fubon Taiwan 50', disp: '006208' }, { sym: '00878.TW', name: 'Cathay ESG High Div', disp: '00878' },
+    { sym: '00919.TW', name: 'Group Benefits High Yield', disp: '00919' }, { sym: '00929.TW', name: 'FSIT Tech Dividend', disp: '00929' },
   ]},
-  { cat: '能源/原物料', stocks: [
+  { cat: 'Energy / Commodities', stocks: [
     { sym: 'XOM', name: 'ExxonMobil' }, { sym: 'CVX', name: 'Chevron' },
-    { sym: 'COP', name: 'ConocoPhillips' }, { sym: 'GLD', name: '黃金 ETF' }, { sym: 'SLV', name: '白銀 ETF' },
+    { sym: 'COP', name: 'ConocoPhillips' }, { sym: 'GLD', name: 'Gold ETF' }, { sym: 'SLV', name: 'Silver ETF' },
   ]},
-  { cat: '中概股', stocks: [
-    { sym: 'BABA', name: '阿里巴巴' }, { sym: 'PDD', name: '拼多多' },
-    { sym: 'JD', name: '京東' }, { sym: 'BIDU', name: '百度' },
+  { cat: 'China ADRs', stocks: [
+    { sym: 'BABA', name: 'Alibaba' }, { sym: 'PDD', name: 'PDD Holdings' },
+    { sym: 'JD', name: 'JD.com' }, { sym: 'BIDU', name: 'Baidu' },
   ]},
 ];
 
 let _parkPickerOpen = false;
+let _parkPreviewGameData = null;
+let _parkPreviewOptions = null;
 
 function _renderParkPicker(q) {
   const panel = document.getElementById('parkPickerPanel');
   if (!panel) return;
   q = (q || '').toLowerCase().trim();
-  let html = `<div class="park-picker-hint">${_parkHtmlIcon('ski')}<span>選擇雪場 · 或直接輸入代碼後按 Enter</span></div>`;
+  let html = `<div class="park-picker-hint">${_parkHtmlIcon('ski')}<span>Select a resort · or type a code and press Enter</span></div>`;
   let anyResult = false;
   _PARK_STOCKS.forEach(({ cat, stocks }) => {
     const btns = stocks.map(s => {
@@ -400,7 +395,7 @@ function _renderParkPicker(q) {
   });
   if (!anyResult) {
     html += `<div class="park-picker-hint" style="color:rgba(255,180,100,0.6);padding:0.6rem 0.4rem">
-      找不到「${_escHtml(q)}」，直接按開始探索！</div>`;
+      No match for "${_escHtml(q)}" — just press Explore!</div>`;
   }
   panel.innerHTML = html;
 }
@@ -428,7 +423,7 @@ function _parkPickStock(sym, name) {
   parkLoadSymbol(sym, name);
 }
 
-/* ════════════ 7. 闖關紀錄（原樣保留） ════════════ */
+/* ════════════ 7. Quest log ════════════ */
 function _getParkQuestLog() {
   try { return JSON.parse(localStorage.getItem('_parkQuestLog') || '[]'); } catch (e) { return []; }
 }
@@ -438,8 +433,8 @@ function _logParkQuest(symbol, name) {
   let log = [];
   try { const s = localStorage.getItem('_parkQuestLog'); if (s) log = JSON.parse(s); } catch (e) {}
   const now = new Date();
-  const timeStr = now.toLocaleDateString('zh-TW') + ' ' +
-    now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+  const timeStr = now.toLocaleDateString('en-US') + ' ' +
+    now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   const idx = log.findIndex(q => q.symbol === symbol);
   if (idx >= 0) {
     log[idx].count = (log[idx].count || 1) + 1;
@@ -456,7 +451,7 @@ function _logParkQuest(symbol, name) {
   if (lbl) lbl.textContent = symbol;
 }
 
-/* ════════════ 8. 個人資料面板（原樣保留） ════════════ */
+/* ════════════ 8. Profile panel ════════════ */
 function toggleParkProfile() {
   const panel = document.getElementById('parkProfilePanel');
   if (!panel) return;
@@ -477,14 +472,14 @@ function renderParkProfile() {
   const explored = questLog.length;
   const visits = questLog.reduce((sum, q) => sum + (q.count || 1), 0);
   const bestSki = progress.bestSkiScore || 0;
-  const level = explored >= 20 ? '滑雪大師' :
-    explored >= 10 ? '中級滑手' :
-      explored >= 3 ? '初級探險者' : '新手滑手';
+  const level = explored >= 20 ? 'Ski Master' :
+    explored >= 10 ? 'Intermediate Rider' :
+      explored >= 3 ? 'Junior Explorer' : 'Beginner';
 
   const medalHtml = [
-    { icon: 'Gold', label: '金牌', key: 'gold' },
-    { icon: 'Silver', label: '銀牌', key: 'silver' },
-    { icon: 'Bronze', label: '銅牌', key: 'bronze' },
+    { icon: 'Gold', label: 'Gold', key: 'gold' },
+    { icon: 'Silver', label: 'Silver', key: 'silver' },
+    { icon: 'Bronze', label: 'Bronze', key: 'bronze' },
   ].map(m => {
     const cnt = medals[m.key] || progress[m.key] || 0;
     return `<span class="park-pp-medal ${cnt > 0 ? 'earned' : 'locked'}">${m.icon} ${m.label} ×${cnt}</span>`;
@@ -502,13 +497,13 @@ function renderParkProfile() {
         </span>
         <span class="park-pp-rec-badge">×${q.count || 1}</span>
       </div>`).join('')
-    : `<div class="park-pp-empty">尚無闖關紀錄，開始探索吧！</div>`;
+    : `<div class="park-pp-empty">No quest history yet — start exploring!</div>`;
 
   const visitedSyms = new Set(questLog.map(q => q.symbol));
   const completedThemes = _PARK_THEME_DEFS.filter(t => t.stages.every(s => visitedSyms.has(s.sym)));
   const themeMedalsHtml = completedThemes.length
     ? `<div class="park-pp-section" style="padding-bottom:0">
-         <div class="park-pp-section-title">主題通關勳章</div>
+         <div class="park-pp-section-title">Theme Completion Medals</div>
        </div>
        <div class="park-pp-theme-medals">
          ${completedThemes.map((t) => {
@@ -517,9 +512,9 @@ function renderParkProfile() {
              <span class="park-pp-theme-medal-icon">${_parkHtmlIcon(t.icon)}</span>
              <span class="park-pp-theme-medal-info">
                <span class="park-pp-theme-medal-title">${_escHtml(t.title)}</span>
-               <span class="park-pp-theme-medal-sub">全 ${t.stages.length} 關通關</span>
+               <span class="park-pp-theme-medal-sub">All ${t.stages.length} stages clear</span>
              </span>
-             <span class="park-pp-theme-medal-badge">完成</span>
+             <span class="park-pp-theme-medal-badge">Done</span>
            </div>`;
     }).join('')}
        </div>` : '';
@@ -531,7 +526,7 @@ function renderParkProfile() {
       <div class="park-pp-header">
         <div class="park-pp-avatar">${_parkHtmlIcon('ski')}</div>
         <div>
-          <div class="park-pp-name">冒險者</div>
+          <div class="park-pp-name">Adventurer</div>
           <div class="park-pp-level">${level}</div>
         </div>
         <button class="park-pp-close" onclick="toggleParkProfile()">X</button>
@@ -539,30 +534,30 @@ function renderParkProfile() {
       <div class="park-pp-stats">
         <div class="park-pp-stat">
           <span class="park-pp-stat-num">${explored}</span>
-          <span class="park-pp-stat-label">探索代碼數</span>
+          <span class="park-pp-stat-label">Symbols Explored</span>
         </div>
         <div class="park-pp-stat">
           <span class="park-pp-stat-num">${visits}</span>
-          <span class="park-pp-stat-label">總探索次數</span>
+          <span class="park-pp-stat-label">Total Runs</span>
         </div>
         <div class="park-pp-stat">
           <span class="park-pp-stat-num">${bestSki}</span>
-          <span class="park-pp-stat-label">最佳滑雪分</span>
+          <span class="park-pp-stat-label">Best Ski Score</span>
         </div>
       </div>
       <div class="park-pp-section">
-        <div class="park-pp-section-title">滑雪獎牌</div>
+        <div class="park-pp-section-title">Ski Medals</div>
         <div class="park-pp-medal-row">${medalHtml}</div>
       </div>
       ${themeMedalsHtml}
       <div class="park-pp-section" style="padding-bottom:0.4rem">
-        <div class="park-pp-section-title">闖關紀錄</div>
+        <div class="park-pp-section-title">Quest History</div>
       </div>
       <div class="park-pp-history-list">${historyHtml}</div>
     </div>`;
 }
 
-/* ════════════ 9. 飄雪粒子（原樣保留） ════════════ */
+/* ════════════ 9. Snowflakes ════════════ */
 function _initParkSnowflakes() {
   const canvas = document.getElementById('parkSnowCanvas');
   if (!canvas || canvas.childElementCount > 0) return;
@@ -583,21 +578,18 @@ function _initParkSnowflakes() {
   }
 }
 
-/* ════════════ 10. 返回首頁 ════════════ */
+/* ════════════ 10. Return to home ════════════ */
 function returnToHome() {
   const parkWelcome = document.getElementById('parkWelcomePage');
   if (parkWelcome) parkWelcome.classList.remove('hidden');
+  document.getElementById('parkPreviewPage')?.classList.add('hidden');
   const input = document.getElementById('parkSymbolInput');
   if (input) input.value = '';
   const lbl = document.getElementById('parkProfileLabel');
-  if (lbl) lbl.textContent = '冒險者';
+  if (lbl) lbl.textContent = 'Adventurer';
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   11. 關鍵改動：從樂園首頁啟動探索
-       原本 → loadStock()（後端 Yahoo Finance）
-       現在 → SkiLevels.buildGameData(symbol) 生成地形 → 開滑雪
-   ═══════════════════════════════════════════════════════════════ */
+/* ════════════ 11. Launch adventure from lobby ════════════ */
 function parkStartAdventure() {
   const parkInput = document.getElementById('parkSymbolInput');
   const parkPeriod = document.getElementById('parkPeriodSelect');
@@ -613,32 +605,112 @@ function parkLoadSymbol(sym, name, period) {
   if (!sym) return;
   period = period || document.getElementById('parkPeriodSelect')?.value || '3mo';
   _logParkQuest(sym, name || window.SkiLevels.nameOf(sym) || '');
-  // 同步顯示用的搜尋欄（隱藏的）
   const parkInput = document.getElementById('parkSymbolInput');
   if (parkInput) parkInput.value = sym;
 
-  // 生成地形資料（取代後端）
   const gameData = window.SkiLevels.buildGameData(sym, period);
   window.currentGameData = gameData;
+  _parkPreviewGameData = gameData;
+  _parkPreviewOptions = {
+    highDetail: false,
+  };
+  renderParkPreview(gameData);
+}
 
-  // 啟動滑雪遊戲
-  if (window.SkiGame) {
-    window.SkiGame.launch(gameData, {
-      highDetail: false,
-      education: gameData.education,
-    });
+function parkLaunchCurrentPreview() {
+  if (!window.SkiGame || !_parkPreviewGameData) return;
+  window.SkiGame.launch(_parkPreviewGameData, _parkPreviewOptions || {
+    highDetail: false,
+  });
+}
+
+function renderParkPreview(gameData) {
+  const preview = document.getElementById('parkPreviewPage');
+  const welcome = document.getElementById('parkWelcomePage');
+  if (!preview || !gameData) return;
+
+  const closes = (gameData.closes || []).map(Number).filter(v => Number.isFinite(v));
+  const first = closes[0] || 0;
+  const last = closes[closes.length - 1] || first;
+  const pct = first ? ((last - first) / first) * 100 : 0;
+  const absMove = Math.abs(last - first);
+  const volume = Math.max(1, Math.round((closes.reduce((sum, v) => sum + Math.abs(v - first), 0) / Math.max(1, closes.length)) * 120000));
+  const difficulty = window.SkiGame?.previewDifficulty?.(gameData, { highDetail: false });
+  const difficultyScore = Math.round(difficulty?.score ?? clampPreviewScore(absMove, pct));
+  const periodLabel = {
+    '1mo': '1 Month',
+    '3mo': '3 Months',
+    '6mo': '6 Months',
+    '1y': '1 Year',
+    '2y': '2 Years',
+  }[gameData.period] || gameData.period || '3 Months';
+
+  setText('parkPreviewSymbol', gameData.symbol || '--');
+  setText('parkPreviewTitle', gameData.name || gameData.symbol || 'Unknown Resort');
+  setText('parkPreviewSubtitle', `${gameData.symbol || 'Route'} is staged as a calm mission preview. Review the terrain, then start when ready.`);
+  setText('parkPreviewPeriod', periodLabel);
+  setText('parkPreviewBest', '--');
+  setText('parkPreviewDifficulty', String(difficultyScore));
+  setText('parkPreviewDifficultyMeta', difficulty?.label || 'Standard mode');
+  setText('parkPreviewPrice', formatPreviewNumber(last));
+  setText('parkPreviewChange', `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`);
+  setText('parkPreviewVolume', formatCompactNumber(volume));
+  renderParkPreviewSparkline(closes);
+
+  welcome?.classList.add('hidden');
+  preview.classList.remove('hidden');
+  preview.scrollIntoView({ block: 'start' });
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function clampPreviewScore(absMove, pct) {
+  return Math.max(10, Math.min(99, 38 + Math.round(absMove / 3 + Math.abs(pct) * 1.2)));
+}
+
+function formatPreviewNumber(value) {
+  return Number.isFinite(value)
+    ? value.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 })
+    : '--';
+}
+
+function formatCompactNumber(value) {
+  return Number.isFinite(value)
+    ? Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(value)
+    : '--';
+}
+
+function renderParkPreviewSparkline(closes) {
+  const svg = document.getElementById('parkPreviewSparkline');
+  if (!svg) return;
+  if (!closes.length) {
+    svg.innerHTML = '';
+    return;
   }
+  const min = Math.min(...closes);
+  const max = Math.max(...closes);
+  const range = max - min || 1;
+  const points = closes.map((v, i) => {
+    const x = (i / Math.max(1, closes.length - 1)) * 900;
+    const y = 150 - ((v - min) / range) * 120;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  svg.innerHTML = `
+    <polyline class="park-preview-line-shadow" points="${points}" />
+    <polyline class="park-preview-line" points="${points}" />
+    <line class="park-preview-baseline" x1="0" y1="150" x2="900" y2="150" />
+  `;
 }
 
-/* ════════════ 12. 勳章同步（ski-game.js 會呼叫） ════════════ */
-function updateSkiMedals() {
-  // park profile 開啟時會即時重算，這裡只需確保全域可呼叫
-}
+/* ════════════ 12. Medal sync (called by ski-game.js) ════════════ */
+function updateSkiMedals() {}
 window.updateSkiMedals = updateSkiMedals;
 
-/* ════════════ 13. 啟動初始化 ════════════ */
+/* ════════════ 13. Init ════════════ */
 (function _setupObservers() {
-  // 售票亭輸入事件
   const parkInput = document.getElementById('parkSymbolInput');
   if (parkInput) {
     parkInput.addEventListener('focus', () => openParkPicker());
@@ -651,7 +723,6 @@ window.updateSkiMedals = updateSkiMedals;
       if (e.key === 'Escape') closeParkPicker();
     });
   }
-  // 點擊外部關閉選股面板
   document.addEventListener('click', e => {
     if (!_parkPickerOpen) return;
     const panel = document.getElementById('parkPickerPanel');
@@ -664,7 +735,6 @@ window.updateSkiMedals = updateSkiMedals;
     }
   });
 
-  // 渲染推薦區 + 飄雪
   renderParkRecommendations();
   _initParkSnowflakes();
 })();

@@ -32,6 +32,7 @@ function makeEl(id) {
     querySelector() { return null; },
     querySelectorAll() { return []; },
     addEventListener() {},
+    scrollIntoView() {},
     appendChild(c) { this.children.push(c); return c; },
   };
   elements.set(id, el);
@@ -82,7 +83,7 @@ console.log('\n═══ 測試 3：主題關卡渲染 ═══');
 const theme = makeEl('parkThemeQuests');
 assert(theme._html.includes('park-theme-card'), '包含 .park-theme-card 卡片');
 assert((theme._html.match(/openThemeQuest\(\d\)/g) || []).length === 8, '渲染出 4 個主題（每主題2個 openThemeQuest = 8）');
-assert(theme._html.includes('AI 晶片') && theme._html.includes('電動車'), '主題標題正確');
+assert(theme._html.includes('AI Chips') && theme._html.includes('EVs'), '主題標題正確');
 assert(theme._html.includes('openThemeQuest('), '主題卡片可點擊開啟 Modal');
 
 console.log('\n═══ 測試 4：parkLoadSymbol 生成遊戲資料 ═══');
@@ -91,31 +92,33 @@ global.window.SkiGame = {
   launch(data, opts) { launchedData = data; launchedOpts = opts; }
 };
 parkLoadSymbol('NVDA', 'Nvidia', '3mo');
+parkLaunchCurrentPreview();
 assert(launchedData !== null, 'parkLoadSymbol 觸發 SkiGame.launch');
 assert(launchedData.symbol === 'NVDA', '遊戲資料 symbol = NVDA');
 assert(Array.isArray(launchedData.closes) && launchedData.closes.length === 80, 'closes 有 80 筆');
 assert(launchedData.dates.length === 80, 'dates 有 80 筆');
-assert(!!launchedData.education && launchedData.education.nodes.length === 3, 'education 有 3 個纜車題');
+assert(!launchedData.education, '不再產生 education 問答資料');
 
 console.log('\n═══ 測試 5：售票亭任意代碼也能玩 ═══');
 parkLoadSymbol('WHATEVER123', '', '1mo');
+parkLaunchCurrentPreview();
 assert(launchedData.symbol === 'WHATEVER123', '任意代碼 WHATEVER123 也能生成關卡');
 assert(launchedData.closes.length === 30, '1mo 期間生成 30 筆資料');
 
 console.log('\n═══ 測試 6：主題任務 Modal 建構 ═══');
 const modalContent = makeEl('parkQuestModalContent');
 const overlay = makeEl('parkQuestModalOverlay');
-openThemeQuest(0); // AI 晶片
-assert(modalContent._html.includes('AI 晶片'), 'Modal 顯示「AI 晶片」主題');
+openThemeQuest(0); // AI Chips
+assert(modalContent._html.includes('AI Chips'), 'Modal 顯示 AI Chips 主題');
 assert(modalContent._html.includes('park-quest-stage-row'), '包含關卡階段列表');
-assert((modalContent._html.match(/park-quest-stage-row/g) || []).length === 6, 'AI 晶片主題有 6 個階段');
+assert((modalContent._html.match(/park-quest-stage-row/g) || []).length === 6, 'AI Chips 主題有 6 個階段');
 
 console.log('\n═══ 測試 7：個人資料面板 ═══');
 const profile = makeEl('parkProfilePanel');
 renderParkProfile();
 assert(profile._html.includes('park-pp-inner'), '個人資料面板已渲染');
-assert(profile._html.includes('滑雪獎牌'), '包含滑雪獎牌區');
-assert(profile._html.includes('闖關紀錄'), '包含闖關紀錄區');
+assert(profile._html.includes('Ski Medals'), '包含滑雪獎牌區');
+assert(profile._html.includes('Quest History'), '包含闖關紀錄區');
 
 console.log('\n═══ 測試 8：飄雪粒子生成 ═══');
 const snow = makeEl('parkSnowCanvas');

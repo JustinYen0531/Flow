@@ -7,8 +7,9 @@
   <title>FLOW</title>
   <meta name="description" content="Turn price trends into a ski resort you can explore. Enter any ticker to ride its terrain." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./ski-game.css" />
@@ -216,7 +217,7 @@
             <div class="park-step-num">3</div>
             <div class="park-step-icon park-html-icon park-html-icon-ski" aria-hidden="true"><span class="park-html-icon-body"></span><span class="park-html-icon-line"></span></div>
             <div class="park-step-title">Complete the Run</div>
-            <div class="park-step-desc">Feel the rhythm as you ski — cable car questions teach you the technique</div>
+            <div class="park-step-desc">Feel the rhythm as you ski — no stops, no prompts, just the run</div>
           </div>
         </div>
 
@@ -239,13 +240,63 @@
           </div>
           <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
             <span class="park-fac-icon park-html-icon park-html-icon-lift" aria-hidden="true"><span></span></span>
-            <div class="park-fac-name">Guide Lift</div>
-            <div class="park-fac-alias">Ski Q&amp;A</div>
+            <div class="park-fac-name">Clean Run</div>
+            <div class="park-fac-alias">No Stops</div>
           </div>
         </div>
 
       </div><!-- /park-content -->
     </div><!-- /parkWelcomePage -->
+
+    <div id="parkPreviewPage" class="hidden">
+      <div class="park-preview-shell">
+        <button class="park-preview-back" type="button" onclick="returnToHome()">Back</button>
+        <div class="park-preview-card">
+          <div class="park-preview-kicker">QUEST READY</div>
+          <div class="park-preview-bg-line" aria-hidden="true"></div>
+          <div class="park-preview-title-row">
+            <div>
+              <div id="parkPreviewSymbol" class="park-preview-symbol">NVDA</div>
+              <h2 id="parkPreviewTitle" class="park-preview-title">Nvidia</h2>
+              <p id="parkPreviewSubtitle" class="park-preview-subtitle">Preview the route before entering the run.</p>
+            </div>
+            <span id="parkPreviewPeriod" class="park-preview-pill">3 Months</span>
+          </div>
+          <div class="park-preview-terrain" aria-hidden="true">
+            <svg id="parkPreviewSparkline" viewBox="0 0 900 180" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="park-preview-grid">
+            <div class="park-preview-stat">
+              <span>Best Run</span>
+              <strong id="parkPreviewBest">--</strong>
+            </div>
+            <div class="park-preview-difficulty">
+              <span>Trail Difficulty</span>
+              <strong id="parkPreviewDifficulty">--</strong>
+              <small id="parkPreviewDifficultyMeta">Standard mode</small>
+            </div>
+            <div class="park-preview-stat park-preview-stat-wide">
+              <span>Last Point</span>
+              <strong id="parkPreviewPrice">--</strong>
+            </div>
+            <div class="park-preview-stat">
+              <span>Terrain Change</span>
+              <strong id="parkPreviewChange">--</strong>
+            </div>
+            <div class="park-preview-stat">
+              <span>Snow Volume</span>
+              <strong id="parkPreviewVolume">--</strong>
+            </div>
+          </div>
+          <div class="park-preview-actions">
+            <button id="parkPreviewStartBtn" class="park-preview-start" type="button" onclick="parkLaunchCurrentPreview()">
+              Start Adventure
+            </button>
+            <button class="park-preview-secondary" type="button" onclick="returnToHome()">Choose Another</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </main>
 

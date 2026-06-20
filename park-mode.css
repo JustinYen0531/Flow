@@ -1,0 +1,3045 @@
+/* ═══════════════════════════════════════════════════════════
+   park-mode.css  —  Flow 樂園模式
+   所有 park-mode 相關樣式獨立於此，不污染原有 style.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Park 設計變數 ─────────────────────────────────── */
+:root {
+  --park-orange:     #ff8c1a;
+  --park-orange-d:   #e56800;
+  --park-orange-glow:rgba(255,140,26,0.35);
+  --park-teal:       #00cfaa;
+  --park-teal-glow:  rgba(0,207,170,0.35);
+  --park-sky-deep:   #060f1e;
+  --park-sky-mid:    #12306a;
+  --park-sky-bright: #2e78c8;
+  --park-snow-pale:  #cce8f8;
+  --park-glass:      rgba(255,255,255,0.11);
+  --park-glass-b:    rgba(255,255,255,0.24);
+  --park-glass-thick:rgba(255,255,255,0.18);
+  --park-text-ice:   #e4f2ff;
+  --park-text-mist:  rgba(200,228,255,0.72);
+  --park-radius:     20px;
+  --park-radius-sm:  12px;
+  --park-shadow:     0 10px 40px rgba(0,0,0,0.4);
+  --park-shadow-lg:  0 16px 60px rgba(0,0,0,0.5);
+}
+
+/* ══════════════════════════════════════════════════════
+   MODE TOGGLE BUTTON（加在 header 右側）
+   ══════════════════════════════════════════════════════ */
+.mode-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.48rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: #b8d4f8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.mode-toggle-btn:hover {
+  background: rgba(255,140,26,0.16);
+  border-color: var(--park-orange);
+  color: var(--park-orange);
+  box-shadow: 0 0 16px rgba(255,140,26,0.28);
+  transform: translateY(-1px);
+}
+.mode-toggle-btn .mtb-icon { font-size: 1rem; }
+
+/* Active state when park mode is on */
+body.park-mode .mode-toggle-btn {
+  background: rgba(255,140,26,0.18);
+  border-color: var(--park-orange);
+  color: var(--park-orange);
+  box-shadow: 0 0 20px rgba(255,140,26,0.3);
+}
+
+/* ══════════════════════════════════════════════════════
+   PARK MODE — BODY / GLOBAL OVERRIDES
+   ══════════════════════════════════════════════════════ */
+body.park-mode {
+  background:
+    linear-gradient(180deg,
+      #060f1e  0%,
+      #12306a 30%,
+      #2e78c8 62%,
+      #9ad0ee 100%
+    ) fixed;
+}
+/* override deep-space radial glow */
+body.park-mode::before {
+  background:
+    radial-gradient(ellipse 70% 35% at 50% 0%,
+      rgba(80,160,255,0.14) 0%, transparent 65%);
+}
+
+body.park-mode .header {
+  background: rgba(6,15,30,0.90);
+  border-bottom-color: rgba(255,255,255,0.10);
+}
+body.park-mode .footer {
+  background: rgba(6,15,30,0.80);
+  border-top-color: rgba(255,255,255,0.08);
+  color: rgba(180,210,240,0.55);
+}
+
+/* ══════════════════════════════════════════════════════
+   PARK WELCOME PAGE  — #parkWelcomePage
+   ══════════════════════════════════════════════════════ */
+#parkWelcomePage {
+  position: relative;
+  min-height: calc(100vh - 58px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Background layers ── */
+/* park-bg 現在是全局元素（不在 parkWelcomePage 裡面）
+   只在 park mode 下可見，否則完全隱藏 */
+.park-bg {
+  display: none;            /* 專業模式：完全隱藏 */
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+body.park-mode .park-bg {
+  display: block;           /* park mode：顯示 */
+}
+
+.park-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    #050d1c  0%,
+    #0a2050  15%,
+    #163a80  35%,
+    #2566b8  55%,
+    #4a9ed6  72%,
+    #80c4e8  85%,
+    #b5dcf2  100%
+  );
+}
+
+/* Aurora glow */
+.park-aurora {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 30%;
+  background: radial-gradient(ellipse,
+    rgba(90,170,255,0.20) 0%,
+    rgba(40,100,230,0.10) 45%,
+    transparent 70%);
+  filter: blur(28px);
+  animation: parkAurora 9s ease-in-out infinite alternate;
+}
+@keyframes parkAurora {
+  0%   { opacity:0.55; transform: translateX(-50%) scaleX(1)   scaleY(1);   }
+  50%  { opacity:0.85; transform: translateX(-50%) scaleX(1.1) scaleY(1.2); }
+  100% { opacity:0.65; transform: translateX(-50%) scaleX(0.9) scaleY(1);   }
+}
+
+/* Subtle star field */
+.park-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at  8%  6%, rgba(255,255,255,0.90), transparent),
+    radial-gradient(1px 1px at 20% 10%, rgba(255,255,255,0.70), transparent),
+    radial-gradient(1.5px 1.5px at 35%  4%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1px 1px at 52%  8%, rgba(255,255,255,0.60), transparent),
+    radial-gradient(1.5px 1.5px at 68%  5%, rgba(255,255,255,0.90), transparent),
+    radial-gradient(1px 1px at 82% 10%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1px 1px at 93%  7%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(1px 1px at 13% 16%, rgba(255,255,255,0.50), transparent),
+    radial-gradient(1px 1px at 45% 13%, rgba(255,255,255,0.70), transparent),
+    radial-gradient(1px 1px at 76% 18%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1px 1px at  4% 22%, rgba(255,255,255,0.40), transparent),
+    radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(1px 1px at 88% 14%, rgba(255,255,255,0.50), transparent),
+    radial-gradient(1px 1px at 30% 22%, rgba(255,255,255,0.45), transparent);
+}
+
+/* Mountains SVG */
+.park-mtn-svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  min-height: 62%;
+}
+
+/* Snowflake canvas */
+.park-snow-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.park-snowflake {
+  position: absolute;
+  top: -30px;
+  pointer-events: none;
+  user-select: none;
+  color: rgba(255,255,255,0.80);
+  animation: parkSnowfall linear infinite;
+}
+@keyframes parkSnowfall {
+  0%   { transform: translateY(-30px) translateX(0px)  rotate(0deg);   opacity: 0.9; }
+  30%  { transform: translateY(30vh)  translateX(25px)  rotate(120deg); }
+  70%  { transform: translateY(70vh)  translateX(-20px) rotate(250deg); opacity: 0.5; }
+  100% { transform: translateY(110vh) translateX(10px)  rotate(360deg); opacity: 0; }
+}
+
+/* Ski character glide */
+.park-ski-char {
+  font-size: 3.2rem;
+  display: inline-block;
+  animation: parkSkiGlide 4s ease-in-out infinite;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45));
+  line-height: 1;
+}
+@keyframes parkSkiGlide {
+  0%,100% { transform: translateX(-14px) rotate(-7deg); }
+  50%     { transform: translateX(14px)  rotate(6deg);  }
+}
+
+/* Ski trail path */
+.park-trail-svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+.park-trail-path {
+  fill: none;
+  stroke: rgba(255,255,255,0.20);
+  stroke-width: 2.5;
+  stroke-dasharray: 14 8;
+  stroke-dashoffset: 0;
+  animation: parkTrailDash 3s linear infinite;
+}
+@keyframes parkTrailDash {
+  to { stroke-dashoffset: -88; }
+}
+
+/* ── Content wrapper ── */
+.park-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.2rem;
+  width: 100%;
+}
+
+/* ── HERO section ── */
+.park-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+}
+
+.park-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.park-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.park-badge.orange {
+  background: var(--park-orange);
+  color: #fff;
+  box-shadow: 0 2px 14px rgba(255,140,26,0.50);
+}
+.park-badge.teal {
+  background: var(--park-teal);
+  color: #062a20;
+  box-shadow: 0 2px 14px rgba(0,207,170,0.45);
+}
+.park-badge.ghost {
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.80);
+}
+
+/* Title */
+.park-title {
+  font-size: clamp(2.4rem, 6.5vw, 4.5rem);
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-shadow:
+    0  1px  0 rgba(255,255,255,0.50),
+    0  3px  0 rgba(160,210,255,0.30),
+    0  7px  0 rgba(0,0,0,0.28),
+    0 12px 24px rgba(0,0,0,0.45),
+    0  0  50px rgba(100,190,255,0.25);
+}
+.park-title .hl-gold {
+  background: linear-gradient(135deg, #ffe066 0%, #ff8c1a 55%, #ff4d4d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(255,160,0,0.55));
+}
+.park-title .hl-ice {
+  background: linear-gradient(135deg, #a0e0ff 0%, #60c0ff 60%, #30a0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.park-subtitle {
+  font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+  color: rgba(210,235,255,0.85);
+  font-weight: 400;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.45);
+  max-width: 580px;
+  line-height: 1.6;
+}
+
+/* ── TICKET BOOTH ── */
+.park-booth {
+  width: 100%;
+  max-width: 720px;
+  background: var(--park-glass);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1.5px solid var(--park-glass-b);
+  border-radius: var(--park-radius);
+  padding: 1.6rem 2rem;
+  box-shadow:
+    var(--park-shadow),
+    inset 0 1.5px 0 rgba(255,255,255,0.38);
+  position: relative;
+  z-index: 20;
+}
+.park-booth-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.1rem;
+}
+.park-booth-icon  { font-size: 1.4rem; }
+.park-booth-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.68);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+}
+
+.park-booth-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.park-input {
+  flex: 1;
+  min-width: 180px;
+  background: rgba(255,255,255,0.10);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: var(--park-radius-sm);
+  padding: 0.8rem 1.15rem;
+  color: #fff;
+  font-size: 0.98rem;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.02em;
+}
+.park-input::placeholder { color: rgba(255,255,255,0.36); }
+.park-input:focus {
+  border-color: var(--park-orange);
+  box-shadow: 0 0 0 3px rgba(255,140,26,0.22);
+  background: rgba(255,255,255,0.14);
+}
+
+.park-period {
+  background: rgba(255,255,255,0.10);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: var(--park-radius-sm);
+  padding: 0.8rem 0.9rem;
+  color: rgba(255,255,255,0.78);
+  font-size: 0.88rem;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.park-period option { background: #12306a; color: #e4f2ff; }
+
+.park-start-btn {
+  padding: 0.8rem 1.7rem;
+  background: linear-gradient(135deg, #ff8c1a 0%, #e55200 100%);
+  border: none;
+  border-radius: var(--park-radius-sm);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.22s ease;
+  box-shadow: 0 5px 20px rgba(255,100,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.park-start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255,100,0,0.55), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+.park-start-btn:active { transform: translateY(0); }
+
+/* ── LIFT TICKETS ── */
+.park-tickets-section {
+  width: 100%;
+  max-width: 780px;
+}
+.park-tickets-label {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(190,220,255,0.55);
+  margin-bottom: 0.9rem;
+}
+.park-tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  gap: 0.7rem;
+}
+
+.park-ticket {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.9rem 0.6rem 0.8rem;
+  border-radius: var(--park-radius-sm);
+  border: 1.5px solid rgba(255,255,255,0.20);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  text-align: center;
+  overflow: hidden;
+}
+/* Notch holes */
+.park-ticket::before,
+.park-ticket::after {
+  content: '';
+  position: absolute;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.30);
+  z-index: 1;
+}
+.park-ticket::before { left: -7px; }
+.park-ticket::after  { right: -7px; }
+/* Dashed center line */
+.park-ticket .ticket-dash {
+  position: absolute;
+  top: 50%; left: 16px; right: 16px;
+  height: 0;
+  border-top: 1.5px dashed rgba(255,255,255,0.18);
+  transform: translateY(-50%);
+}
+
+.park-ticket:hover {
+  transform: translateY(-5px) scale(1.05);
+  z-index: 2;
+}
+
+.park-ticket-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: #fff;
+  position: relative; z-index: 2;
+}
+.park-ticket-name {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.82);
+  font-weight: 500;
+  position: relative; z-index: 2;
+}
+
+/* Ticket color themes */
+.park-ticket[data-color="green"] {
+  background: linear-gradient(145deg, #065535 0%, #0b9060 50%, #0fc87a 100%);
+  box-shadow: 0 5px 18px rgba(15,200,122,0.38);
+}
+.park-ticket[data-color="green"]:hover {
+  box-shadow: 0 10px 28px rgba(15,200,122,0.55);
+}
+.park-ticket[data-color="red"] {
+  background: linear-gradient(145deg, #7a0000 0%, #c82020 50%, #ff4040 100%);
+  box-shadow: 0 5px 18px rgba(255,64,64,0.38);
+}
+.park-ticket[data-color="red"]:hover {
+  box-shadow: 0 10px 28px rgba(255,64,64,0.55);
+}
+.park-ticket[data-color="silver"] {
+  background: linear-gradient(145deg, #2a3a4a 0%, #5a7a90 50%, #90b8d0 100%);
+  box-shadow: 0 5px 18px rgba(144,184,208,0.35);
+}
+.park-ticket[data-color="silver"]:hover {
+  box-shadow: 0 10px 28px rgba(144,184,208,0.52);
+}
+.park-ticket[data-color="blue"] {
+  background: linear-gradient(145deg, #003890 0%, #1060c8 50%, #3090f0 100%);
+  box-shadow: 0 5px 18px rgba(48,144,240,0.38);
+}
+.park-ticket[data-color="blue"]:hover {
+  box-shadow: 0 10px 28px rgba(48,144,240,0.55);
+}
+.park-ticket[data-color="purple"] {
+  background: linear-gradient(145deg, #400070 0%, #8020d0 50%, #b050f0 100%);
+  box-shadow: 0 5px 18px rgba(176,80,240,0.38);
+}
+.park-ticket[data-color="purple"]:hover {
+  box-shadow: 0 10px 28px rgba(176,80,240,0.55);
+}
+.park-ticket[data-color="rainbow"] {
+  background: linear-gradient(145deg, #c84000 0%, #c89000 28%, #208040 55%, #0048c8 100%);
+  box-shadow: 0 5px 18px rgba(100,100,200,0.38);
+}
+.park-ticket[data-color="rainbow"]:hover {
+  box-shadow: 0 10px 28px rgba(100,100,200,0.55);
+}
+.park-ticket[data-color="tw"] {
+  background: linear-gradient(145deg, #002888 0%, #1050c8 50%, #4888f0 100%);
+  box-shadow: 0 5px 18px rgba(72,136,240,0.38);
+}
+.park-ticket[data-color="tw"]:hover {
+  box-shadow: 0 10px 28px rgba(72,136,240,0.55);
+}
+
+/* ══════════════════════════════════════════════════════
+   PARK RECOMMENDATION SECTIONS
+   每日關卡 / 熱門關卡 / 主題關卡
+   ══════════════════════════════════════════════════════ */
+
+/* ── Section 通用 wrapper ── */
+.park-section {
+  width: 100%;
+  max-width: 780px;
+}
+.park-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.park-section-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+.park-section-kicker {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--park-teal);
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+.park-section-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+}
+.park-section-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.22rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.park-section-badge.daily  { background: linear-gradient(135deg,#ffe066,#ff8c1a); color:#1a0a00; }
+.park-section-badge.hot    { background: linear-gradient(135deg,#ff5555,#c80000); color:#fff; }
+.park-section-badge.theme  { background: linear-gradient(135deg,#00cfaa,#0090c0); color:#062a20; }
+
+.park-rec-loading {
+  text-align: center;
+  color: var(--park-text-mist);
+  font-size: 0.82rem;
+  padding: 2rem 1rem;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────────
+   每日關卡 — 全寬英雄卡
+   ───────────────────────────────────────────── */
+.park-daily-quest-wrap { width: 100%; }
+
+.park-daily-card {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  background: var(--park-glass);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1.5px solid rgba(255,210,50,0.22);
+  border-radius: var(--park-radius);
+  padding: 2rem 2.2rem;
+  box-shadow:
+    0 0 0 1px rgba(255,210,50,0.08),
+    0 12px 48px rgba(0,0,0,0.38),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+  cursor: pointer;
+  transition: transform 0.22s, box-shadow 0.22s;
+  position: relative;
+  overflow: hidden;
+}
+/* 金色輝光裝飾 */
+.park-daily-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(255,210,50,0.14) 0%, transparent 65%);
+  pointer-events: none;
+}
+.park-daily-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgba(255,210,50,0.28),
+    0 18px 56px rgba(0,0,0,0.48),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+}
+
+/* Left info */
+.park-daily-left { flex: 1; min-width: 0; }
+
+.park-daily-sym-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.park-daily-symbol {
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  color: #ffe066;
+  text-shadow: 0 0 24px rgba(255,220,50,0.55), 0 2px 0 rgba(0,0,0,0.3);
+  line-height: 1;
+}
+.park-daily-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.58);
+}
+
+.park-daily-summary {
+  font-size: 0.83rem;
+  color: rgba(210,235,255,0.72);
+  line-height: 1.6;
+  margin-bottom: 0.9rem;
+}
+
+.park-daily-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+.park-quest-chip {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.11);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.78);
+}
+.park-quest-chip.primary {
+  background: rgba(255,140,26,0.18);
+  border-color: rgba(255,140,26,0.38);
+  color: #ffb060;
+}
+.park-quest-chip.success {
+  background: rgba(0,207,170,0.15);
+  border-color: rgba(0,207,170,0.32);
+  color: var(--park-teal);
+}
+.park-quest-chip.warning {
+  background: rgba(255,220,50,0.14);
+  border-color: rgba(255,220,50,0.28);
+  color: #ffe066;
+}
+
+.park-victory-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,220,80,0.65);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.park-victory-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+}
+.park-victory-cond {
+  font-size: 0.73rem;
+  color: rgba(190,230,170,0.80);
+}
+
+/* Right CTA */
+.park-daily-right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.3rem;
+}
+.park-daily-diff-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--park-text-mist);
+  text-align: center;
+}
+.park-daily-stars { font-size: 1.1rem; }
+
+.park-daily-btn {
+  padding: 0.78rem 1.5rem;
+  background: linear-gradient(135deg, #ffe066 0%, #ff8c1a 100%);
+  border: none;
+  border-radius: var(--park-radius-sm);
+  color: #1a0800;
+  font-size: 0.92rem;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 5px 20px rgba(255,180,0,0.50),
+              inset 0 1px 0 rgba(255,255,255,0.30);
+  transition: all 0.22s ease;
+  letter-spacing: 0.02em;
+}
+.park-daily-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255,180,0,0.65),
+              inset 0 1px 0 rgba(255,255,255,0.30);
+}
+.park-daily-btn:active { transform: translateY(0); }
+
+/* ─────────────────────────────────────────────
+   熱門關卡 — 單列縱排
+   ───────────────────────────────────────────── */
+.park-hot-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.park-hot-card {
+  background: var(--park-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255,255,255,0.10);
+  border-radius: var(--park-radius-sm);
+  padding: 1.1rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.park-hot-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.32);
+}
+.park-hot-card.is-up   { border-color: rgba(0,207,120,0.25); }
+.park-hot-card.is-down { border-color: rgba(255,80,80,0.25); }
+.park-hot-card.is-up::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle at top right, rgba(0,207,120,0.12), transparent 70%);
+  pointer-events: none;
+}
+.park-hot-card.is-down::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle at top right, rgba(255,80,80,0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.park-hot-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.park-hot-rank {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--park-orange);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.park-hot-rank.rank-1 { background: linear-gradient(135deg,#ffe066,#ff8c1a); color:#1a0800; }
+.park-hot-rank.rank-2 { background: linear-gradient(135deg,#d0d8e8,#8090b0); }
+.park-hot-rank.rank-3 { background: linear-gradient(135deg,#c8843a,#8a5020); }
+
+.park-hot-sym-group { flex: 1; min-width: 0; }
+.park-hot-symbol {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+  display: block;
+  line-height: 1.2;
+}
+.park-hot-name {
+  font-size: 0.65rem;
+  color: var(--park-text-mist);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.park-hot-change {
+  font-size: 0.88rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.park-hot-card.is-up   .park-hot-change { color: #00cf88; }
+.park-hot-card.is-down .park-hot-change { color: #ff6060; }
+
+.park-hot-blurb {
+  font-size: 0.73rem;
+  color: var(--park-text-mist);
+  line-height: 1.5;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.park-hot-btn {
+  padding: 0.38rem 0.8rem;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.78);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  align-self: flex-start;
+}
+.park-hot-btn:hover {
+  background: var(--park-orange);
+  border-color: var(--park-orange);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────
+   主題關卡 — 1×4 橫排
+   ───────────────────────────────────────────── */
+.park-theme-band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+.park-theme-card {
+  background: var(--park-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--park-glass-b);
+  border-radius: var(--park-radius-sm);
+  padding: 1.2rem 0.9rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.42rem;
+}
+.park-theme-card:hover {
+  background: var(--park-glass-thick);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.32);
+}
+.park-theme-card-icon  { font-size: 1.9rem; line-height: 1; }
+.park-theme-card-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+}
+.park-theme-card-desc {
+  font-size: 0.68rem;
+  color: var(--park-text-mist);
+  line-height: 1.45;
+}
+.park-theme-picks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+.park-theme-pick {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.16rem 0.48rem;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.11);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.78);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.park-theme-pick:hover {
+  background: var(--park-teal);
+  border-color: var(--park-teal);
+  color: #062a20;
+}
+.park-theme-btn {
+  margin-top: auto;
+  padding: 0.38rem 0.9rem;
+  background: rgba(0,207,170,0.14);
+  border: 1px solid rgba(0,207,170,0.28);
+  border-radius: 999px;
+  color: var(--park-teal);
+  font-size: 0.70rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.park-theme-btn:hover {
+  background: var(--park-teal);
+  color: #062a20;
+}
+
+/* ── Responsive 補充 ── */
+@media (max-width: 768px) {
+  .park-daily-card { flex-direction: column; }
+  .park-daily-thumb { width: 100%; height: 100px; }
+  .park-daily-right { width: 100%; flex-direction: row; align-items: center; }
+  .park-daily-btn   { flex: 1; text-align: center; }
+  .park-theme-band  { grid-template-columns: repeat(2, 1fr); }
+  .park-hot-card { flex-wrap: wrap; }
+  .park-hot-blurb { flex-basis: 100%; }
+}
+@media (max-width: 500px) {
+  .park-theme-band { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PATCH C: 每日關卡縮圖 + 熱門關卡橫排 + 個人資料面板
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 每日關卡縮圖 ── */
+.park-daily-thumb {
+  width: 148px;
+  min-height: 148px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.85rem 0.7rem;
+  gap: 0.35rem;
+}
+.park-daily-thumb-bg {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0;
+  flex-shrink: 0;
+}
+.park-daily-thumb-sym {
+  position: relative;
+  z-index: 2;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  text-align: center;
+  line-height: 1.1;
+  word-break: break-all;
+}
+.park-daily-thumb-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.park-daily-thumb-spark {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 44px;
+  opacity: 0.85;
+}
+
+/* ── 熱門關卡 — 每行一個橫排 ── */
+.park-hot-card {
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 0.9rem 1.2rem !important;
+  gap: 0.9rem !important;
+}
+/* 拆掉 card-top 包裝，直接讓子元素橫排 */
+.park-hot-card-top {
+  display: contents !important;
+}
+.park-hot-sym-group {
+  min-width: 120px;
+  flex-shrink: 0;
+}
+.park-hot-change {
+  min-width: 60px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.park-hot-blurb {
+  flex: 1 !important;
+  -webkit-line-clamp: 1 !important;
+  display: -webkit-box !important;
+  overflow: hidden !important;
+}
+.park-hot-btn {
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════
+   PATCH D: 售票亭選股下拉面板
+   ══════════════════════════════════════════════ */
+
+.park-picker-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  min-width: 480px;
+  max-width: 720px;
+  max-height: 480px;
+  overflow-y: auto;
+  z-index: 500;
+  background: rgba(6, 14, 34, 0.97);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1.5px solid rgba(0, 207, 170, 0.22);
+  border-radius: 18px;
+  box-shadow: 0 16px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,207,170,0.08);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: parkPickerIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes parkPickerIn {
+  from { opacity:0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.park-picker-panel.hidden { display: none !important; }
+
+/* scrollbar */
+.park-picker-panel::-webkit-scrollbar { width: 4px; }
+.park-picker-panel::-webkit-scrollbar-track { background: transparent; }
+.park-picker-panel::-webkit-scrollbar-thumb { background: rgba(0,207,170,0.28); border-radius: 2px; }
+
+/* search hint bar */
+.park-picker-hint {
+  font-size: 0.65rem;
+  color: rgba(180,210,255,0.40);
+  padding: 0 0.25rem 0.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  letter-spacing: 0.04em;
+}
+
+/* category block */
+.park-picker-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.park-picker-cat.all-hidden { display: none; }
+.park-picker-cat-hd {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(0,207,170,0.55);
+  padding: 0.35rem 0.4rem 0.1rem;
+}
+.park-picker-stocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0 0.1rem;
+}
+
+/* stock button */
+.park-picker-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.38rem 0.78rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #fff;
+}
+.park-picker-btn:hover {
+  background: rgba(0,207,170,0.18);
+  border-color: rgba(0,207,170,0.40);
+  transform: translateY(-1px);
+}
+.park-picker-btn.hidden { display: none; }
+.park-picker-btn-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.80rem;
+  font-weight: 800;
+  color: var(--park-teal);
+  line-height: 1;
+}
+.park-picker-btn-name {
+  font-size: 0.68rem;
+  color: rgba(200,225,255,0.58);
+  line-height: 1;
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 個人資料按鈕（header 內） ── */
+.park-profile-btn {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0,207,170,0.30);
+  background: rgba(0,207,170,0.10);
+  color: var(--park-teal);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.park-profile-btn:hover {
+  background: rgba(0,207,170,0.20);
+  border-color: var(--park-teal);
+  box-shadow: 0 0 14px rgba(0,207,170,0.28);
+}
+body.park-mode .park-profile-btn { display: flex; }
+
+/* ── 個人資料面板 ── */
+.park-profile-panel {
+  position: fixed;
+  top: 62px;
+  right: 1.2rem;
+  width: 330px;
+  max-height: 82vh;
+  z-index: 300;
+  background: rgba(8,18,40,0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  box-shadow: 0 10px 48px rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: parkPpSlideIn 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes parkPpSlideIn {
+  from { opacity:0; transform: translateY(-14px) scale(0.96); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.park-profile-panel.hidden { display: none !important; }
+
+.park-pp-inner { overflow-y: auto; flex: 1; }
+
+/* Header */
+.park-pp-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.2rem 1.2rem 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.park-pp-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00cfaa, #0080c0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 3px 14px rgba(0,207,170,0.38);
+}
+.park-pp-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+}
+.park-pp-level {
+  font-size: 0.72rem;
+  color: var(--park-teal);
+  font-weight: 600;
+  margin-top: 0.1rem;
+}
+.park-pp-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.45);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.park-pp-close:hover { color: #fff; background: rgba(255,255,255,0.10); }
+
+/* Stats row */
+.park-pp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.park-pp-stat {
+  padding: 0.9rem 0.5rem;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.park-pp-stat:last-child { border-right: none; }
+.park-pp-stat-num {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.park-pp-stat-label {
+  font-size: 0.62rem;
+  color: var(--park-text-mist);
+  font-weight: 500;
+}
+
+/* Medals */
+.park-pp-section {
+  padding: 0.9rem 1.2rem 0;
+}
+.park-pp-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(180,210,255,0.55);
+  margin-bottom: 0.6rem;
+}
+.park-pp-medal-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+.park-pp-medal {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.park-pp-medal.earned {
+  background: rgba(255,220,50,0.15);
+  border: 1px solid rgba(255,220,50,0.30);
+  color: #ffe066;
+}
+.park-pp-medal.locked {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.25);
+  filter: grayscale(1);
+}
+
+/* History list */
+.park-pp-history-list {
+  padding: 0 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.park-pp-empty {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--park-text-mist);
+  font-style: italic;
+  padding: 1rem 0;
+}
+.park-pp-record {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--park-radius-sm);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.park-pp-record:hover { background: rgba(255,255,255,0.10); }
+.park-pp-rec-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+.park-pp-rec-info { flex: 1; min-width: 0; }
+.park-pp-rec-name {
+  font-size: 0.70rem;
+  color: var(--park-text-mist);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.park-pp-rec-time {
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.28);
+  margin-top: 0.1rem;
+}
+.park-pp-rec-badge {
+  font-size: 0.65rem;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0,207,170,0.15);
+  border: 1px solid rgba(0,207,170,0.28);
+  color: var(--park-teal);
+  flex-shrink: 0;
+}
+
+/* ── 3-STEP FLOW ── */
+.park-steps {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 780px;
+}
+.park-step {
+  flex: 1;
+  background: var(--park-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--park-glass-b);
+  padding: 1.5rem 1.2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+}
+.park-step:first-of-type  { border-radius: var(--park-radius) 0 0 var(--park-radius); }
+.park-step:last-of-type   { border-radius: 0 var(--park-radius) var(--park-radius) 0; }
+.park-step:hover {
+  background: var(--park-glass-thick);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.35);
+}
+/* Connector */
+.park-step + .park-step {
+  border-left: none;
+}
+.park-step-num {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--park-orange);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 12px rgba(255,140,26,0.55);
+  flex-shrink: 0;
+}
+.park-step-icon  { font-size: 2rem; line-height: 1; }
+.park-step-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fff;
+}
+.park-step-desc {
+  font-size: 0.74rem;
+  color: var(--park-text-mist);
+  line-height: 1.55;
+}
+
+/* ── FACILITY CARDS (feature cards) ── */
+.park-facilities {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 780px;
+}
+.park-facility {
+  background: var(--park-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--park-glass-b);
+  border-radius: var(--park-radius-sm);
+  padding: 1.1rem 0.8rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.18);
+}
+.park-facility:hover {
+  background: var(--park-glass-thick);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+}
+.park-fac-icon  { font-size: 1.7rem; display: block; margin-bottom: 0.4rem; }
+.park-fac-name  { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.88); }
+.park-fac-alias { font-size: 0.68rem; color: var(--park-teal); font-weight: 600; margin-top: 0.12rem; }
+
+/* ══════════════════════════════════════════════════════
+   PARK MODE — DASHBOARD OVERRIDES
+   When body.park-mode and #dashboard is visible
+   ══════════════════════════════════════════════════════ */
+
+/* Park dashboard intro banner */
+.park-dash-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  margin-bottom: 1rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg,
+    rgba(255,140,26,0.18) 0%,
+    rgba(0,207,170,0.12) 50%,
+    rgba(48,120,255,0.18) 100%);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+  animation: parkBannerIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes parkBannerIn {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.park-dash-banner-icon { font-size: 2rem; flex-shrink: 0; }
+.park-dash-banner-text { flex: 1; min-width: 0; }
+.park-dash-banner-text h3 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.15rem;
+}
+.park-dash-banner-text p {
+  font-size: 0.75rem;
+  color: var(--park-text-mist);
+  margin: 0;
+}
+.park-dash-ski-btn {
+  padding: 0.5rem 1.1rem;
+  background: var(--park-orange);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 3px 14px rgba(255,140,26,0.42);
+  flex-shrink: 0;
+}
+.park-dash-ski-btn:hover {
+  box-shadow: 0 6px 20px rgba(255,140,26,0.60);
+  transform: translateY(-2px);
+}
+
+/* Stat card park aliases */
+.park-stat-alias {
+  display: none;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--park-teal);
+  letter-spacing: 0.04em;
+  margin-top: 0.1rem;
+}
+body.park-mode .park-stat-alias { display: block; }
+body.park-mode .stat-card {
+  border-color: rgba(0,207,170,0.18);
+}
+body.park-mode .stat-card-title {
+  color: var(--park-teal);
+}
+
+/* Tab button park theme */
+body.park-mode .tab-btn.active {
+  border-color: var(--park-orange);
+  color: var(--park-orange);
+  background: rgba(255,140,26,0.12);
+  box-shadow: 0 2px 12px rgba(255,140,26,0.20);
+}
+body.park-mode .tab-btn:not(.active):hover {
+  border-color: rgba(255,140,26,0.40);
+  color: rgba(255,200,120,0.90);
+}
+
+/* Ski launch button extra glow in park mode */
+body.park-mode .ski-launch-big {
+  background: linear-gradient(135deg, #ff8c1a 0%, #ff4500 100%) !important;
+  box-shadow: 0 6px 26px rgba(255,100,0,0.50) !important;
+  animation: parkSkiPulse 2.8s ease-in-out infinite !important;
+}
+@keyframes parkSkiPulse {
+  0%,100% { box-shadow: 0 6px 26px rgba(255,100,0,0.50); }
+  50%     { box-shadow: 0 8px 36px rgba(255,100,0,0.72), 0 0 20px rgba(255,140,26,0.35); }
+}
+
+/* Education preview card in park mode */
+body.park-mode .education-preview-card {
+  border-color: rgba(0,207,170,0.28);
+}
+body.park-mode .education-preview-kicker {
+  color: var(--park-teal) !important;
+}
+body.park-mode .education-preview-badge {
+  background: rgba(0,207,170,0.18) !important;
+  color: var(--park-teal) !important;
+  border-color: rgba(0,207,170,0.35) !important;
+}
+
+/* Advice card signal badge */
+body.park-mode .signal-badge {
+  outline-color: rgba(255,140,26,0.4);
+}
+
+/* Chart card border in park mode */
+body.park-mode .chart-card {
+  border-color: rgba(255,255,255,0.10);
+}
+body.park-mode .chart-label {
+  color: rgba(200,228,255,0.70);
+}
+
+/* Stock header card */
+body.park-mode .stock-header-card {
+  background: linear-gradient(135deg,
+    rgba(18,48,106,0.75) 0%,
+    rgba(12,30,70,0.75) 100%);
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* Stock action card in park mode */
+body.park-mode .stock-action-card {
+  background: linear-gradient(135deg,
+    rgba(18,48,106,0.75) 0%,
+    rgba(10,25,60,0.75) 100%);
+  border-color: rgba(0,207,170,0.20);
+}
+body.park-mode .ski-action-title { color: var(--park-orange); }
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .park-title { font-size: 2.1rem; }
+  .park-subtitle { font-size: 0.92rem; }
+  .park-booth { padding: 1.2rem 1.1rem; }
+  .park-booth-row { flex-direction: column; }
+  .park-start-btn { width: 100%; text-align: center; }
+
+  .park-steps { flex-direction: column; }
+  .park-step {
+    border-radius: var(--park-radius-sm) !important;
+    border: 1px solid var(--park-glass-b) !important;
+  }
+
+  .park-facilities { grid-template-columns: repeat(2, 1fr); }
+  .park-tickets-grid { grid-template-columns: repeat(3, 1fr); }
+
+  .park-dash-banner { flex-wrap: wrap; }
+  .park-dash-ski-btn { width: 100%; text-align: center; }
+}
+@media (max-width: 460px) {
+  .park-tickets-grid { grid-template-columns: repeat(2, 1fr); }
+  .park-content { padding: 2rem 1rem 4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PATCH A: 背景全屏修正
+   park-bg 改為 position:fixed，突破 main-container 的寬度限制
+   當 #parkWelcomePage 被 display:none 時，fixed 子元素也一起消失
+   ═══════════════════════════════════════════════════════════ */
+.park-bg {
+  position: fixed !important;
+  inset: 0;
+  z-index: 0;
+}
+/* park content 確保在 fixed 背景之上 */
+.park-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PATCH B: Header 搜尋欄樂園化
+   把深色專業風格的 input / select / 分析按鈕 改為冰晶玻璃 + 橙色
+   ═══════════════════════════════════════════════════════════ */
+
+/* Logo 圖示換成滑雪人 */
+body.park-mode .logo-icon {
+  font-size: 0;
+}
+body.park-mode .logo-icon::before {
+  content: '⛷️';
+  font-size: 1.4rem;
+}
+/* Logo 文字 → 冰藍/青色漸層 */
+body.park-mode .logo-text {
+  background: linear-gradient(135deg, #60c8ff 0%, #00cfaa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body.park-mode .logo-sub {
+  color: rgba(180,220,255,0.55);
+  -webkit-text-fill-color: rgba(180,220,255,0.55);
+}
+
+/* 搜尋輸入框 → 玻璃風 */
+body.park-mode #symbolInput {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.22);
+  color: #e8f4ff;
+  font-family: 'JetBrains Mono', monospace;
+}
+body.park-mode #symbolInput::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+body.park-mode #symbolInput:focus {
+  border-color: var(--park-orange);
+  box-shadow: 0 0 0 3px rgba(255,140,26,0.22);
+  background: rgba(255,255,255,0.15);
+}
+
+/* 時間段選擇器 → 玻璃風 */
+body.park-mode #periodSelect {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.78);
+}
+body.park-mode #periodSelect option {
+  background: #12306a;
+  color: #e4f2ff;
+}
+
+/* 分析按鈕 → 橙色冒險感 */
+body.park-mode .btn-search {
+  background: linear-gradient(135deg, #ff8c1a 0%, #e55200 100%) !important;
+  box-shadow: 0 4px 16px rgba(255,100,0,0.40);
+}
+body.park-mode .btn-search:hover {
+  opacity: 1;
+  box-shadow: 0 6px 22px rgba(255,100,0,0.58);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════
+   PATCH F: dashboard 遊戲化
+   全部在 body.park-mode 下生效，不影響專業模式
+   ══════════════════════════════════════════════════════ */
+
+/* ── 儀表板底色 → 由全局 .park-bg 提供（山景+下雪） ── */
+body.park-mode #dashboard::before {
+  display: none;  /* park-bg handles everything */
+}
+
+/* ── 1. QUEST 關卡標題卡 ── */
+body.park-mode .stock-header-card {
+  background: linear-gradient(145deg, rgba(6,14,38,0.97) 0%, rgba(12,26,66,0.95) 100%);
+  border: 1.5px solid rgba(255,210,50,0.28);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  padding-top: 3rem !important;
+}
+/* "QUEST IN PROGRESS" kicker */
+body.park-mode .stock-header-card::before {
+  content: '⚔️  QUEST IN PROGRESS';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 0.55rem 1.4rem;
+  font-size: 0.60rem;
+  font-weight: 900;
+  color: rgba(255,210,50,0.70);
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  background: rgba(255,210,50,0.07);
+  border-bottom: 1px solid rgba(255,210,50,0.14);
+}
+/* Gold shimmer */
+body.park-mode .stock-header-card::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(255,210,50,0.09) 0%, transparent 65%);
+  pointer-events: none;
+}
+/* Big game-style stock name */
+body.park-mode .stock-name {
+  font-size: clamp(2.2rem, 5vw, 3.2rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  background: linear-gradient(135deg, #ffe066 0%, #ffb300 55%, #ff8c1a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(255,180,0,0.38));
+}
+/* Symbol badge → game level tag */
+body.park-mode .stock-symbol-badge {
+  background: rgba(255,210,50,0.12) !important;
+  border: 1.5px solid rgba(255,210,50,0.32) !important;
+  color: #ffe066 !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  border-radius: 8px !important;
+}
+/* Price stat labels → game language via data-park */
+body.park-mode .stat-label { font-size: 0 !important; }
+body.park-mode .stat-label[data-park]::before {
+  content: attr(data-park);
+  font-size: 0.68rem;
+  color: rgba(180,210,255,0.55);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+/* Price value → bigger, monospace */
+body.park-mode .price-value {
+  font-size: 1.9rem !important;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff;
+}
+
+/* ── 2. 滑雪啟動 → 關卡挑戰中心 ── */
+body.park-mode .stock-action-card {
+  background: linear-gradient(145deg,
+    rgba(255,90,0,0.10) 0%, rgba(10,8,4,0.92) 100%);
+  border: 1.5px solid rgba(255,100,0,0.28) !important;
+  border-radius: 18px;
+}
+body.park-mode .ski-action-title {
+  font-size: 1.1rem !important;
+  font-weight: 900;
+  color: #ffb300 !important;
+  letter-spacing: 0.02em;
+}
+body.park-mode .ski-action-desc { font-size: 0 !important; }
+body.park-mode .ski-action-desc::before {
+  content: '征服這條雪道，挑戰極限！';
+  font-size: 0.82rem;
+  color: rgba(255,200,100,0.65);
+}
+/* Mega start button */
+body.park-mode .ski-launch-big {
+  background: linear-gradient(135deg, #ff8c1a 0%, #ffb300 50%, #ff5500 100%) !important;
+  box-shadow: 0 6px 32px rgba(255,120,0,0.55), 0 0 0 2px rgba(255,180,0,0.18) !important;
+  font-size: 1.05rem !important;
+  padding: 0.95rem 1.8rem !important;
+  border-radius: 14px !important;
+  animation: parkPulse 2.5s infinite;
+  letter-spacing: 0.03em;
+}
+/* Difficulty label → game language */
+body.park-mode .ski-difficulty-label { font-size: 0 !important; }
+body.park-mode .ski-difficulty-label::before {
+  content: '🏔️ 雪道難度';
+  font-size: 0.70rem;
+  color: rgba(180,210,255,0.60);
+  font-weight: 700;
+}
+
+/* ── 3. 教育纜車預習 → 任務地形簡報 ── */
+body.park-mode .education-preview-card {
+  background: rgba(6,14,40,0.94);
+  border: 1.5px solid rgba(0,207,170,0.22);
+  border-radius: 18px;
+}
+body.park-mode .education-preview-kicker { font-size: 0 !important; }
+body.park-mode .education-preview-kicker::before {
+  content: '🗺️  任務地形簡報';
+  font-size: 0.70rem;
+  font-weight: 900;
+  color: rgba(0,207,170,0.80);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+body.park-mode .education-preview-badge {
+  background: rgba(0,207,170,0.12) !important;
+  border: 1px solid rgba(0,207,170,0.28) !important;
+  color: var(--park-teal) !important;
+  font-size: 0 !important;
+}
+body.park-mode .education-preview-badge::before {
+  content: '情報';
+  font-size: 0.70rem;
+}
+
+/* ── 4. AI 建議 → NPC 嚮導對話框 ── */
+body.park-mode .advice-card {
+  background: rgba(4,12,34,0.96);
+  border: 1.5px solid rgba(80,160,255,0.22) !important;
+  border-radius: 20px;
+  position: relative;
+}
+/* Speech bubble triangle at top */
+body.park-mode .advice-card::before {
+  content: '';
+  position: absolute;
+  top: -9px; left: 36px;
+  width: 0; height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 9px solid rgba(80,160,255,0.22);
+}
+/* NPC avatar icon */
+body.park-mode .advice-icon {
+  width: 46px !important; height: 46px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #00cfaa, #0080c0) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-size: 1.3rem !important;
+  box-shadow: 0 0 18px rgba(0,207,170,0.42) !important;
+  flex-shrink: 0 !important;
+}
+/* NPC name replace */
+body.park-mode .advice-title { font-size: 0 !important; }
+body.park-mode .advice-title::before {
+  content: '⛷️ AI 嚮導';
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+}
+body.park-mode .advice-summary {
+  font-size: 0.95rem !important;
+  line-height: 1.75 !important;
+  color: rgba(220,235,255,0.88) !important;
+  font-style: italic;
+}
+/* Signal badge → game verdict */
+body.park-mode #signalBadge {
+  font-weight: 900;
+  font-size: 0.88rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+}
+
+/* ── 5. 圖表 Tabs → 地形掃描 ── */
+body.park-mode .tab-btn {
+  border-radius: 10px !important;
+}
+/* Hide original text, show game alias */
+body.park-mode .tab-btn > :not(.park-tab-alias) { display: none; }
+body.park-mode .park-tab-alias {
+  display: inline !important;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+/* Active tab highlight */
+body.park-mode .tab-btn.active {
+  background: rgba(0,207,170,0.18) !important;
+  border-color: rgba(0,207,170,0.40) !important;
+  color: var(--park-teal) !important;
+}
+
+/* ── 6. 圖表標題 + info tags → 遊戲語言 ── */
+body.park-mode .chart-label { font-size: 0 !important; }
+body.park-mode .chart-label[data-park]::before {
+  content: attr(data-park);
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: rgba(180,215,255,0.85);
+}
+body.park-mode .info-tag { font-size: 0 !important; }
+body.park-mode .info-tag[data-park]::before {
+  content: attr(data-park);
+  font-size: 0.70rem;
+}
+
+/* ── 7. 指標卡 → 遊戲 HUD 面板 ── */
+body.park-mode .stat-card {
+  background: rgba(6,16,44,0.92);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 1rem 0.8rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+body.park-mode .stat-card:hover {
+  border-color: rgba(0,207,170,0.30);
+  box-shadow: 0 0 14px rgba(0,207,170,0.10);
+}
+/* Hide tech label, show only game alias */
+body.park-mode .stat-card-title { font-size: 0 !important; }
+body.park-mode .park-stat-alias {
+  font-size: 0.72rem !important;
+  display: block !important;
+  color: rgba(0,207,170,0.78) !important;
+  font-weight: 800;
+  margin-bottom: 0.3rem;
+  font-style: normal;
+}
+body.park-mode .stat-card-value {
+  font-size: 1.3rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff;
+}
+
+/* Tab alias hidden in pro mode */
+.park-tab-alias { display: none; }
+
+/* ══════════════════════════════════════════════════════
+   PATCH E: 主題關卡地圖 — 進度條 + 任務流程燈
+   ══════════════════════════════════════════════════════ */
+
+/* 主題卡進度條 */
+.park-theme-prog-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0.5rem 0 0.15rem;
+}
+.park-theme-prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00cfaa, #00ff88);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 6px rgba(0,207,170,0.45);
+}
+.park-theme-prog-label {
+  font-size: 0.60rem;
+  color: rgba(180,210,255,0.45);
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+.park-theme-crown { font-size: 0.85rem; margin-left: 0.25rem; }
+.park-theme-card.is-complete {
+  border-color: rgba(255,220,50,0.45) !important;
+  box-shadow: 0 0 24px rgba(255,220,50,0.14), 0 8px 28px rgba(0,0,0,0.30);
+}
+
+/* ── 關卡流程 Modal ── */
+.park-quest-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 20, 0.86);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: parkFadeIn 0.20s ease;
+}
+@keyframes parkFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.park-quest-overlay.hidden { display: none !important; }
+
+.park-quest-modal {
+  width: min(600px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: rgba(8, 16, 38, 0.98);
+  border: 1.5px solid rgba(0, 207, 170, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.75);
+  animation: parkPickerIn 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.park-quest-modal::-webkit-scrollbar { width: 4px; }
+.park-quest-modal::-webkit-scrollbar-thumb { background: rgba(0,207,170,0.28); border-radius: 2px; }
+
+.park-quest-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.8rem 1.8rem 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.park-quest-modal-icon { font-size: 2.5rem; line-height: 1; flex-shrink: 0; }
+.park-quest-modal-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+.park-quest-modal-desc {
+  font-size: 0.78rem;
+  color: rgba(180, 210, 255, 0.60);
+  line-height: 1.5;
+}
+.park-quest-modal-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.40);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.park-quest-modal-close:hover { color: #fff; background: rgba(255,255,255,0.10); }
+
+.park-quest-progress-section {
+  padding: 1rem 1.8rem 0.6rem;
+}
+.park-quest-prog-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+.park-quest-prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00cfaa, #00ff88);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(0, 207, 170, 0.50);
+}
+.park-quest-prog-label {
+  font-size: 0.70rem;
+  color: rgba(180, 210, 255, 0.50);
+  text-align: right;
+}
+
+.park-quest-complete-banner {
+  margin: 0 1.8rem 0.8rem;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(135deg, rgba(255,220,50,0.15), rgba(0,207,120,0.10));
+  border: 1px solid rgba(255, 220, 50, 0.32);
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffe066;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* Stage list — vertical timeline */
+.park-quest-stage-list {
+  padding: 1.2rem 1.8rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.park-quest-stage-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.park-quest-stage-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 38px;
+}
+
+.park-quest-stage-indicator {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  border: 2px solid;
+  transition: all 0.3s;
+}
+.park-quest-stage-row.done   .park-quest-stage-indicator {
+  background: rgba(0, 207, 100, 0.18);
+  border-color: #00cf64;
+  color: #00cf88;
+}
+.park-quest-stage-row.active .park-quest-stage-indicator {
+  background: rgba(255, 180, 0, 0.18);
+  border-color: #ffb300;
+  color: #ffb300;
+  box-shadow: 0 0 14px rgba(255,180,0,0.40);
+  animation: parkPulse 2s infinite;
+}
+@keyframes parkPulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(255,180,0,0.40); }
+  50%       { box-shadow: 0 0 22px rgba(255,180,0,0.70); }
+}
+.park-quest-stage-row.locked .park-quest-stage-indicator {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 0.78rem;
+}
+
+.park-quest-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 28px;
+  background: rgba(255, 255, 255, 0.10);
+  margin: 4px 0;
+  border-radius: 1px;
+  transition: background 0.4s;
+}
+.park-quest-stage-row.done .park-quest-connector {
+  background: rgba(0, 207, 100, 0.35);
+}
+
+.park-quest-stage-content {
+  flex: 1;
+  padding-bottom: 1.6rem;
+  min-width: 0;
+}
+.park-quest-stage-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.28rem;
+  flex-wrap: wrap;
+}
+.park-quest-stage-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.park-quest-stage-row.done   .park-quest-stage-sym { color: #00cf88; }
+.park-quest-stage-row.active .park-quest-stage-sym { color: #ffe066; }
+.park-quest-stage-row.locked .park-quest-stage-sym { color: rgba(255,255,255,0.30); }
+.park-quest-stage-name {
+  font-size: 0.82rem;
+  color: rgba(200, 225, 255, 0.58);
+}
+.park-quest-stage-num {
+  margin-left: auto;
+  font-size: 0.62rem;
+  color: rgba(180, 210, 255, 0.32);
+  font-weight: 600;
+}
+.park-quest-stage-desc {
+  font-size: 0.75rem;
+  color: rgba(180, 210, 255, 0.48);
+  line-height: 1.5;
+  margin-bottom: 0.55rem;
+}
+.park-quest-stage-action { margin-top: 0.3rem; }
+.park-quest-stage-btn {
+  padding: 0.42rem 1.2rem;
+  background: linear-gradient(135deg, #ffb300, #ff8c1a);
+  border: none;
+  border-radius: 999px;
+  color: #1a0800;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 3px 12px rgba(255,180,0,0.38);
+}
+.park-quest-stage-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255,180,0,0.55);
+}
+.park-quest-stage-done-label {
+  font-size: 0.75rem;
+  color: #00cf88;
+  font-weight: 700;
+}
+.park-quest-stage-locked-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.26);
+}
+
+/* Theme medals in profile */
+.park-pp-theme-medals {
+  padding: 0 1.2rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.park-pp-theme-medal {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 220, 50, 0.09);
+  border: 1px solid rgba(255, 220, 50, 0.22);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffe066;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.park-pp-theme-medal:hover {
+  background: rgba(255, 220, 50, 0.17);
+  border-color: rgba(255, 220, 50, 0.40);
+}
+.park-pp-theme-medal-icon { font-size: 1.1rem; }
+.park-pp-theme-medal-info { flex: 1; }
+.park-pp-theme-medal-title { font-size: 0.78rem; font-weight: 800; color: #ffe066; }
+.park-pp-theme-medal-sub { font-size: 0.62rem; color: rgba(255,220,50,0.58); font-weight: 500; }
+.park-pp-theme-medal-badge {
+  font-size: 0.62rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255,220,50,0.15);
+  border: 1px solid rgba(255,220,50,0.30);
+  color: #ffe066;
+  flex-shrink: 0;
+}
+
+/* 繼續任務 banner hint */
+.park-dash-banner-task {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255,220,50,0.12);
+  border: 1px solid rgba(255,220,50,0.25);
+  color: #ffe066;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.park-dash-banner-task:hover { background: rgba(255,220,50,0.22); }
+
+/* ══════════════════════════════════════════════════════
+   PATCH G: Dashboard → Game World Hero Launcher
+   ══════════════════════════════════════════════════════ */
+
+/* Dashboard becomes a flex column so sections stack cleanly */
+body.park-mode #dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── 1. Stock header → floating quest title banner ── */
+body.park-mode .stock-header-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.8rem 1rem 0 !important;
+  text-align: center;
+}
+body.park-mode .stock-header-main {
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+body.park-mode .stock-price-area {
+  justify-content: center !important;
+  gap: 1.8rem !important;
+  flex-wrap: wrap;
+}
+/* Price stats compact in header */
+body.park-mode .price-stat {
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── 2. Action card → Hero Launch Pad ── */
+body.park-mode .stock-action-card {
+  background:
+    linear-gradient(160deg, rgba(4,14,40,0.52) 0%, rgba(2,8,26,0.66) 100%),
+    var(--park-quest-thumb, linear-gradient(160deg, rgba(4,14,40,0.98) 0%, rgba(2,8,26,0.99) 100%)) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border: 1.5px solid rgba(0,207,170,0.28) !important;
+  border-radius: 22px !important;
+  box-shadow:
+    0 0 0 1px rgba(0,207,170,0.06) inset,
+    0 0 60px rgba(0,100,255,0.08),
+    0 12px 40px rgba(0,0,0,0.45) !important;
+  padding: 2rem 1.5rem 1.8rem !important;
+  position: relative;
+  overflow: hidden;
+}
+body.park-mode .stock-action-card::before {
+  content: '';
+  position: absolute;
+  inset: -22px;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(2,8,26,0.04), rgba(2,8,26,0.22)),
+    var(--park-quest-thumb, transparent);
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.18) brightness(0.9);
+  transform: scale(1.01);
+  opacity: 0.92;
+  pointer-events: none;
+}
+body.park-mode .stock-action-card > * {
+  position: relative;
+  z-index: 1;
+}
+/* Slow sweep shimmer */
+body.park-mode .stock-action-card::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: 0; left: -120%;
+  width: 80%; height: 100%;
+  background: linear-gradient(105deg,
+    transparent 0%,
+    rgba(0,207,170,0.06) 50%,
+    transparent 100%);
+  animation: park-card-sweep 5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes park-card-sweep {
+  0%   { left: -120%; opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { left: 140%; opacity: 0; }
+}
+
+/* "滑雪挑戰模式" title row → hidden in park mode (replaced by quest kicker in header) */
+body.park-mode .ski-action-info {
+  display: none !important;
+}
+
+/* Achievement strip → centered medals */
+body.park-mode .ski-achievement-strip {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-bottom: 1.2rem !important;
+}
+body.park-mode .ski-best-row {
+  gap: 1.5rem !important;
+}
+
+/* Controls → center everything */
+body.park-mode .ski-action-controls {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+}
+
+/* Sliders panel → hidden by default in park mode */
+body.park-mode .ski-sliders-panel {
+  display: none !important;
+}
+/* Show sliders when intel is open */
+body.park-mode #dashboard.park-intel-open .ski-sliders-panel {
+  display: block !important;
+}
+
+/* Button group → vertical stack centered */
+body.park-mode .ski-btn-group {
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  gap: 0.75rem !important;
+}
+
+/* Difficulty panel → full width pill */
+body.park-mode .ski-difficulty-panel {
+  width: 100% !important;
+  max-width: 420px !important;
+  border-radius: 14px !important;
+}
+
+/* ── 發起冒險按鈕 ── */
+body.park-mode #skiLaunchButton {
+  width: 100% !important;
+  max-width: 320px !important;
+  padding: 0.95rem 1.8rem !important;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
+  border-radius: 16px !important;
+  border: none !important;
+  background: linear-gradient(135deg, #00cfaa 0%, #0088e0 55%, #5a3cff 100%) !important;
+  color: #fff !important;
+  letter-spacing: 0.05em !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.12) inset,
+    0 0 40px rgba(0,207,170,0.40),
+    0 8px 32px rgba(0,100,255,0.30) !important;
+  animation: park-launch-glow 2.5s ease-in-out infinite !important;
+  cursor: pointer;
+  flex-shrink: 0 !important;
+}
+body.park-mode #skiLaunchButton:hover {
+  transform: translateY(-3px) scale(1.015) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.18) inset,
+    0 0 70px rgba(0,207,170,0.65),
+    0 12px 48px rgba(0,100,255,0.50) !important;
+}
+@keyframes park-launch-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.12) inset,
+      0 0 40px rgba(0,207,170,0.40),
+      0 8px 32px rgba(0,100,255,0.30);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.18) inset,
+      0 0 65px rgba(0,207,170,0.65),
+      0 8px 50px rgba(0,100,255,0.50);
+  }
+}
+
+/* Launch button text → game text */
+body.park-mode #skiLaunchButton .ski-btn-text {
+  font-size: 0 !important;
+}
+body.park-mode #skiLaunchButton .ski-btn-text::before {
+  content: '開始冒險！';
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+body.park-mode #skiLaunchButton .ski-btn-icon {
+  font-size: 1.7rem !important;
+}
+
+/* Integrated quest launch layout: the action area floats inside the quest hero instead of
+   reading as a separate framed board. */
+body.park-mode #dashboard {
+  gap: 0;
+}
+body.park-mode .stock-header-card {
+  min-height: clamp(340px, 42vh, 460px);
+  margin-bottom: 0 !important;
+  padding: 3.2rem 2rem 9.5rem !important;
+}
+body.park-mode .stock-header-main {
+  min-height: clamp(250px, 30vh, 320px);
+  justify-content: center !important;
+  position: relative;
+}
+body.park-mode .stock-title-area {
+  flex: 0 1 auto !important;
+  justify-content: center;
+}
+body.park-mode .stock-price-area {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-left: 0 !important;
+}
+body.park-mode .stock-action-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 2rem 1.5rem !important;
+  margin: clamp(-9.4rem, -13vw, -7.4rem) 0 0 !important;
+  overflow: visible !important;
+}
+body.park-mode .stock-action-card::before,
+body.park-mode .stock-action-card::after {
+  display: none !important;
+}
+body.park-mode .stock-action-area {
+  min-height: 9.5rem;
+  display: grid !important;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "records"
+    "medals";
+  align-items: end !important;
+  gap: 0.65rem 1.4rem !important;
+  position: relative;
+}
+body.park-mode .ski-achievement-strip {
+  grid-area: records;
+  align-self: end;
+  justify-self: center;
+  width: min(28rem, 100%);
+  margin: 0 !important;
+  gap: 0.55rem !important;
+}
+body.park-mode .ski-best-row {
+  width: min(13.5rem, 100%);
+  justify-content: center;
+  gap: 0.7rem !important;
+  margin: 0 auto;
+}
+body.park-mode .ski-best-stat {
+  min-width: 4.2rem;
+  padding: 0.55rem 0.75rem !important;
+  text-align: center;
+  background: rgba(4, 13, 34, 0.46) !important;
+  border-color: rgba(125, 211, 252, 0.2) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+}
+body.park-mode .ski-medal-group {
+  grid-area: medals;
+  justify-content: center !important;
+  flex-wrap: wrap;
+  gap: 0.48rem !important;
+  margin-top: 0.1rem;
+}
+body.park-mode .ski-medal {
+  background: rgba(4, 13, 34, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+}
+body.park-mode .ski-medal.earned {
+  background: rgba(255, 140, 26, 0.18) !important;
+  border-color: rgba(255, 190, 80, 0.46) !important;
+}
+body.park-mode .ski-action-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(26rem, 100%);
+}
+body.park-mode .ski-btn-group {
+  max-width: none !important;
+  width: 100% !important;
+}
+body.park-mode .ski-difficulty-panel {
+  width: 100% !important;
+  max-width: none !important;
+  background: rgba(9, 20, 38, 0.72) !important;
+  border-color: rgba(125, 211, 252, 0.26) !important;
+  backdrop-filter: blur(12px);
+}
+body.park-mode #skiLaunchButton {
+  max-width: none !important;
+}
+@media (max-width: 900px) {
+  body.park-mode .stock-header-card {
+    padding-bottom: 14.5rem !important;
+  }
+  body.park-mode .stock-price-area {
+    position: static;
+  }
+  body.park-mode .stock-action-card {
+    margin-top: -13.5rem !important;
+    padding-inline: 1rem !important;
+  }
+  body.park-mode .stock-action-area {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "controls"
+      "records"
+      "medals";
+    justify-items: center;
+    min-height: 0;
+  }
+  body.park-mode .ski-action-controls {
+    position: static;
+    justify-self: center;
+  }
+}
+
+/* ── 3. Mission Intel Toggle Button ── */
+.park-intel-toggle-wrap {
+  display: none; /* hidden in pro mode */
+}
+body.park-mode .park-intel-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.2rem 0;
+}
+.park-intel-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: linear-gradient(135deg, rgba(0,207,170,0.25), rgba(0,150,200,0.20));
+  border: 1.2px solid rgba(0,207,170,0.40);
+  border-radius: 12px;
+  color: rgba(200,240,255,0.90);
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 0.7rem 2rem;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 16px rgba(0,207,170,0.15);
+}
+.park-intel-toggle-btn:hover {
+  background: linear-gradient(135deg, rgba(0,207,170,0.35), rgba(0,150,200,0.30));
+  border-color: rgba(0,207,170,0.55);
+  color: #fff;
+  box-shadow: 0 0 28px rgba(0,207,170,0.30);
+  transform: translateY(-2px);
+}
+.park-intel-arrow {
+  display: inline-block;
+  transition: transform 0.30s ease;
+  font-style: normal;
+}
+body.park-mode #dashboard.park-intel-open .park-intel-arrow {
+  transform: rotate(180deg);
+}
+
+/* ── 4. Analysis sections → hidden until MISSION INTEL unlocked ── */
+body.park-mode #dashboard:not(.park-intel-open) #educationPreviewCard,
+body.park-mode #dashboard:not(.park-intel-open) #adviceCard,
+body.park-mode #dashboard:not(.park-intel-open) .chart-tabs,
+body.park-mode #dashboard:not(.park-intel-open) .charts-area,
+body.park-mode #dashboard:not(.park-intel-open) .stats-row {
+  display: none !important;
+}
+
+/* When open: fade in the revealed sections */
+body.park-mode #dashboard.park-intel-open #educationPreviewCard,
+body.park-mode #dashboard.park-intel-open #adviceCard,
+body.park-mode #dashboard.park-intel-open .chart-tabs,
+body.park-mode #dashboard.park-intel-open .charts-area,
+body.park-mode #dashboard.park-intel-open .stats-row {
+  animation: park-intel-reveal 0.35s ease forwards;
+}
+@keyframes park-intel-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 5. 真實縮圖背景 (park-dash-thumb) ── */
+/* 預設隱藏（專業模式） */
+.park-dash-thumb {
+  display: none;
+}
+/* Park mode: keep the actual thumbnail source available for cards that reuse it. */
+body.park-mode .park-dash-thumb {
+  display: none !important;
+}
+@keyframes park-thumb-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Game menu hierarchy: re-rank existing dashboard controls without adding UI. */
+body.park-mode .header {
+  background: rgba(3, 9, 24, 0.82);
+  position: relative;
+  z-index: 50; /* Ensure header stays above all background layers */
+}
+/* Logo: clickable in park mode (returns to home) */
+body.park-mode .logo {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+body.park-mode .logo:hover {
+  opacity: 0.75;
+}
+body.park-mode .search-bar {
+  /* Full brightness + normal scale for full usability */
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+body.park-mode .mode-toggle-btn {
+  padding: 0.54rem 1rem;
+  background: rgba(255, 140, 26, 0.08);
+  box-shadow: none;
+}
+body.park-mode .park-dash-banner {
+  margin-bottom: 0.4rem;
+  padding: 0.55rem 1rem;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+body.park-mode .park-dash-banner-icon {
+  font-size: 1.35rem;
+}
+body.park-mode .park-dash-banner-text h3 {
+  font-size: 0.88rem;
+}
+body.park-mode .park-dash-banner-text p {
+  font-size: 0.68rem;
+}
+body.park-mode .park-dash-banner-task {
+  order: 2;
+  margin-left: auto;
+  padding: 0.34rem 0.78rem;
+  font-size: 0.68rem;
+  background: rgba(255, 220, 50, 0.08);
+  border-color: rgba(255, 220, 50, 0.18);
+  opacity: 0.86;
+}
+body.park-mode .park-dash-ski-btn {
+  order: 3;
+  padding: 0.34rem 0.8rem;
+  background: rgba(255, 140, 26, 0.12);
+  border: 1px solid rgba(255, 140, 26, 0.22);
+  box-shadow: none;
+  color: rgba(255, 220, 180, 0.78);
+  font-size: 0.68rem;
+}
+body.park-mode .stock-header-card {
+  min-height: clamp(500px, calc(100vh - 180px), 650px);
+  padding: 3.4rem 2rem 16.5rem !important;
+  background:
+    radial-gradient(ellipse 90% 42% at 50% 4%, rgba(80, 180, 255, 0.10), transparent 68%),
+    linear-gradient(180deg, rgba(3, 9, 24, 0.34) 0%, rgba(3, 9, 24, 0.56) 46%, rgba(3, 9, 24, 0.84) 100%),
+    var(--park-quest-thumb, transparent) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 210, 50, 0.08),
+    inset 0 -160px 160px rgba(2, 8, 26, 0.46),
+    0 18px 48px rgba(0, 0, 0, 0.42) !important;
+}
+body.park-mode .stock-header-main {
+  min-height: clamp(250px, 28vh, 330px);
+}
+body.park-mode .stock-title-area {
+  transform: translateY(-1.1rem);
+}
+body.park-mode .stock-name {
+  font-size: clamp(1.9rem, 4vw, 2.65rem) !important;
+  filter: drop-shadow(0 2px 10px rgba(255, 180, 0, 0.26));
+}
+body.park-mode .stock-price-area {
+  right: 1rem;
+  bottom: -0.25rem;
+  opacity: 0.86;
+}
+body.park-mode .stock-action-card {
+  margin-top: clamp(-18rem, -26vw, -15.2rem) !important;
+  padding: 0 2rem 0.65rem !important;
+}
+body.park-mode .stock-action-area {
+  min-height: 15.9rem;
+  justify-items: center;
+  align-items: end !important;
+  grid-template-areas:
+    "controls";
+  gap: 0.7rem !important;
+}
+body.park-mode .ski-action-controls {
+  position: static;
+  justify-self: center;
+  width: min(46rem, 100%);
+}
+body.park-mode .ski-btn-group {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 0.72rem !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+body.park-mode .ski-difficulty-panel {
+  width: min(22rem, 100%) !important;
+  min-width: 0 !important;
+  padding: 0.68rem 0.9rem !important;
+  opacity: 0.9;
+}
+body.park-mode .ski-difficulty-score {
+  font-size: 1.85rem;
+}
+body.park-mode #skiLaunchButton {
+  width: min(42rem, 100%) !important;
+  max-width: none !important;
+  min-height: 6.4rem;
+  padding: 1.75rem 2.6rem !important;
+  border-radius: 24px !important;
+  transform: translateY(0);
+}
+body.park-mode #skiLaunchButton:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+}
+body.park-mode #skiLaunchButton .ski-btn-text::before {
+  font-size: clamp(1.65rem, 3vw, 2.4rem);
+}
+body.park-mode #skiLaunchButton .ski-btn-icon {
+  font-size: clamp(2rem, 3.4vw, 2.6rem) !important;
+}
+body.park-mode .park-intel-toggle-wrap {
+  padding-top: 0;
+  margin-top: 0.55rem;
+  margin-bottom: 1rem;
+}
+body.park-mode .park-intel-toggle-btn {
+  padding: 0.38rem 1rem;
+  font-size: 0.7rem;
+  opacity: 0.72;
+  background: rgba(255, 255, 255, 0.035);
+}
+body.park-mode .ski-achievement-strip {
+  opacity: 0.62;
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 2.4rem);
+  transform: translateX(-50%) scale(0.82);
+  transform-origin: center top;
+}
+body.park-mode .ski-medal-group {
+  opacity: 0.64;
+}
+@media (max-width: 900px) {
+  body.park-mode .search-bar {
+    transform: none;
+    opacity: 0.9;
+  }
+  body.park-mode .park-dash-banner {
+    gap: 0.55rem;
+  }
+  body.park-mode .park-dash-banner-task,
+  body.park-mode .park-dash-ski-btn {
+    margin-left: 0;
+  }
+  body.park-mode .stock-header-card {
+    min-height: 480px;
+    padding-bottom: 14.5rem !important;
+  }
+  body.park-mode .stock-price-area {
+    opacity: 0.78;
+  }
+  body.park-mode .stock-action-card {
+    margin-top: -20rem !important;
+    padding-inline: 1rem !important;
+  }
+  body.park-mode #skiLaunchButton {
+    min-height: 5.5rem;
+    padding: 1.35rem 1.3rem !important;
+  }
+}
+
+/* Final quest panel placement: keep the important game stats in view. */
+body.park-mode .stock-action-area {
+  display: grid !important;
+  grid-template-columns: minmax(11rem, 0.78fr) minmax(22rem, 1.45fr) minmax(11rem, 0.78fr) !important;
+  grid-template-areas: "best controls medals" !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  column-gap: clamp(0.8rem, 2vw, 1.6rem) !important;
+  min-height: clamp(13.5rem, 22vh, 16rem) !important;
+}
+
+body.park-mode .ski-achievement-strip {
+  grid-area: 1 / 1 / 2 / 4 !important;
+  display: grid !important;
+  grid-template-columns: minmax(11rem, 0.78fr) minmax(22rem, 1.45fr) minmax(11rem, 0.78fr) !important;
+  grid-template-areas: "best spacer medals" !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  opacity: 1 !important;
+  z-index: 1;
+  pointer-events: none;
+}
+
+body.park-mode .ski-best-row {
+  grid-area: best !important;
+  align-self: center !important;
+  justify-self: start !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(12rem, 100%) !important;
+  gap: 0.7rem !important;
+  margin: 0 !important;
+}
+
+body.park-mode .ski-best-stat {
+  min-width: 0 !important;
+  width: 100%;
+  padding: 0.72rem 0.9rem !important;
+  border: 1px solid rgba(110, 185, 255, 0.28) !important;
+  background: rgba(5, 14, 34, 0.74) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(14px);
+}
+
+body.park-mode .ski-best-label {
+  font-size: 0.72rem !important;
+  color: rgba(165, 205, 255, 0.82) !important;
+}
+
+body.park-mode .ski-best-stat strong {
+  font-size: 1.25rem !important;
+  color: rgba(238, 248, 255, 0.98) !important;
+}
+
+body.park-mode .ski-medal-group {
+  grid-area: medals !important;
+  align-self: center !important;
+  justify-self: end !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.55rem !important;
+  width: min(12rem, 100%) !important;
+  opacity: 1 !important;
+}
+
+body.park-mode .ski-medal {
+  justify-content: flex-start !important;
+  min-height: 2.2rem;
+  padding: 0.5rem 0.74rem !important;
+  border-radius: 999px !important;
+  background: rgba(5, 14, 34, 0.66) !important;
+  border-color: rgba(115, 170, 245, 0.24) !important;
+}
+
+body.park-mode .ski-medal.unlocked {
+  background: rgba(255, 170, 34, 0.16) !important;
+  border-color: rgba(255, 190, 80, 0.58) !important;
+}
+
+body.park-mode .ski-action-controls {
+  grid-area: controls !important;
+  position: relative !important;
+  z-index: 2;
+  justify-self: center !important;
+  align-self: center !important;
+  width: min(42rem, 100%) !important;
+}
+
+body.park-mode .ski-sliders-panel {
+  display: block !important;
+  width: 100%;
+  margin: 0 0 0.75rem;
+}
+
+body.park-mode .stock-action-card.ski-tuning-collapsed .ski-sliders-panel {
+  display: none !important;
+}
+
+body.park-mode .ski-difficulty-panel {
+  position: relative;
+  z-index: 3;
+}
+
+@media (max-width: 900px) {
+  body.park-mode .stock-action-area {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "best"
+      "controls"
+      "medals" !important;
+    row-gap: 0.8rem !important;
+    min-height: 0 !important;
+  }
+
+  body.park-mode .ski-achievement-strip {
+    grid-area: 1 / 1 / 4 / 2 !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "best"
+      "spacer"
+      "medals" !important;
+    row-gap: 0.75rem !important;
+  }
+
+  body.park-mode .ski-best-row,
+  body.park-mode .ski-medal-group {
+    justify-self: center !important;
+    width: min(24rem, 100%) !important;
+  }
+
+  body.park-mode .ski-best-row {
+    flex-direction: row !important;
+  }
+
+  body.park-mode .ski-medal-group {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center !important;
+  }
+}

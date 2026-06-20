@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLOW</title>
+  <meta name="description" content="把走勢變成一座可以探索的滑雪樂園。輸入任何代碼，進入對應主題雪場。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./ski-game.css" />
+  <link rel="stylesheet" href="./park-mode.css" />
+</head>
+
+<!-- 永遠是 park-mode（純遊戲，沒有專業儀表板） -->
+<body class="park-mode">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo" onclick="returnToHome()" title="點擊返回首頁">
+        <span class="logo-icon">⛷️</span>
+        <span class="logo-text">Flow</span>
+        <span class="logo-sub">滑雪冒險</span>
+      </div>
+      <!-- 原專業模式搜尋欄保留結構（隱藏，因為純遊戲不需搜尋列） -->
+      <div class="search-bar" style="display:none">
+        <input id="symbolInput" type="text" autocomplete="off" spellcheck="false" />
+        <select id="periodSelect"><option value="3mo" selected>3 個月</option></select>
+        <button id="searchBtn" class="btn-search"><span id="searchBtnText">分析</span></button>
+      </div>
+      <!-- 個人資料按鈕 -->
+      <button class="park-profile-btn" id="parkProfileBtn" onclick="toggleParkProfile()">
+        <span>⛷️</span>
+        <span id="parkProfileLabel">冒險者</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main-container">
+
+    <!-- ═══ park-mode 背景：山景 SVG + 飄雪（原樣保留） ═══ -->
+    <div class="park-bg" id="parkGlobalBg">
+      <div class="park-sky"></div>
+      <div class="park-stars"></div>
+      <div class="park-aurora"></div>
+
+      <!-- 山脈 SVG -->
+      <svg class="park-mtn-svg" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+        <!-- 最遠山脈 — 深藍 -->
+        <path d="M0,520 L0,265 L80,192 L160,228 L240,158 L320,205 L400,128 L480,182 L560,100 L640,162 L720,112 L800,170 L880,92 L960,148 L1040,118 L1120,175 L1200,132 L1280,186 L1360,140 L1440,168 L1440,520 Z"
+              fill="#0e2050"/>
+        <!-- 遠山雪帽 -->
+        <path d="M392,135 L400,118 L408,132 Z" fill="rgba(255,255,255,0.75)"/>
+        <path d="M550,108 L560,90  L572,105 Z" fill="rgba(255,255,255,0.80)"/>
+        <path d="M873,99  L882,82  L893,97  Z" fill="rgba(255,255,255,0.75)"/>
+        <path d="M1122,125 L1130,110 L1140,124 Z" fill="rgba(255,255,255,0.65)"/>
+
+        <!-- 中層山脈 — 中藍 -->
+        <path d="M0,520 L0,295 L120,205 L240,258 L360,168 L480,238 L600,148 L720,218 L840,172 L960,230 L1080,162 L1200,225 L1320,178 L1440,212 L1440,520 Z"
+              fill="#1a3a82"/>
+        <!-- 中山雪帽 -->
+        <path d="M348,178 L360,158 L372,176 Z" fill="rgba(255,255,255,0.85)"/>
+        <path d="M585,158 L600,138 L616,156 Z" fill="rgba(255,255,255,0.90)"/>
+        <path d="M1066,172 L1080,152 L1094,170 Z" fill="rgba(255,255,255,0.82)"/>
+
+        <!-- 近景山脈 — 較亮藍 -->
+        <path d="M0,520 L0,352 L180,248 L360,322 L540,208 L720,288 L900,228 L1080,305 L1260,248 L1440,282 L1440,520 Z"
+              fill="#2562b0"/>
+        <!-- 近山雪帽 -->
+        <path d="M525,220 L540,200 L556,218 Z" fill="rgba(255,255,255,0.80)"/>
+        <path d="M887,240 L900,220 L914,238 Z" fill="rgba(255,255,255,0.78)"/>
+
+        <!-- 滑雪道路徑（白色虛線軌跡） -->
+        <path d="M540,208 Q600,280 680,295 Q760,310 820,270 Q880,232 940,260 Q1000,288 1080,305"
+              fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="3"
+              stroke-dasharray="12 7" class="park-trail-path"/>
+
+        <!-- 雪地地面 -->
+        <path d="M0,520 L0,460 Q180,438 360,450 Q540,462 720,448 Q900,434 1080,452 Q1260,468 1440,448 L1440,520 Z"
+              fill="#c0dff5"/>
+        <!-- 雪地亮面 -->
+        <path d="M0,520 L0,488 Q360,472 720,482 Q1080,492 1440,474 L1440,520 Z"
+              fill="#ddf0fc"/>
+      </svg>
+
+      <!-- 飄雪粒子容器（JS 動態生成） -->
+      <div class="park-snow-canvas" id="parkSnowCanvas"></div>
+    </div>
+
+    <!-- ═══ Flow 歡迎頁 ═══ -->
+    <div id="parkWelcomePage">
+
+      <!-- ── 樂園內容 ── -->
+      <div class="park-content">
+
+        <!-- HERO -->
+        <div class="park-hero">
+          <span class="park-ski-char">⛷️</span>
+
+          <div class="park-badge-row">
+            <span class="park-badge teal">✨ Adventure Mode</span>
+            <span class="park-badge ghost">Beta</span>
+          </div>
+
+          <h1 class="park-title">
+            <span class="hl-ice">FLOW</span>
+          </h1>
+          <p class="park-subtitle">
+            Experience another person's flow.<br/>
+            Follow the Flow.
+          </p>
+        </div>
+
+        <!-- 售票亭 -->
+        <div class="park-booth">
+          <div class="park-booth-header">
+            <span class="park-booth-icon">🎟️</span>
+            <span class="park-booth-title">售票亭 · 輸入雪場代碼</span>
+          </div>
+          <div class="park-booth-row" style="position:relative">
+            <input id="parkSymbolInput" class="park-input" type="text"
+              placeholder="雪場代碼 e.g. NVDA, TSLA, 2330.TW"
+              autocomplete="off" spellcheck="false" />
+            <select id="parkPeriodSelect" class="park-period">
+              <option value="1mo">1 個月</option>
+              <option value="3mo" selected>3 個月</option>
+              <option value="6mo">6 個月</option>
+              <option value="1y">1 年</option>
+              <option value="2y">2 年</option>
+            </select>
+            <button class="park-start-btn" onclick="parkStartAdventure()">
+              🎿 開始探索！
+            </button>
+            <!-- 售票亭代碼選單 -->
+            <div id="parkPickerPanel" class="park-picker-panel hidden"></div>
+          </div>
+        </div>
+
+        <!-- ── 每日關卡（全寬 featured）── -->
+        <div class="park-section" style="max-width:100%">
+          <div class="park-section-header">
+            <span class="park-section-icon">📅</span>
+            <div>
+              <div class="park-section-kicker">TODAY'S QUEST</div>
+              <h2 class="park-section-title">每日關卡</h2>
+            </div>
+            <span class="park-section-badge daily">DAILY</span>
+          </div>
+          <div id="parkDailyQuest" class="park-daily-quest-wrap">
+            <div class="park-rec-loading">正在準備今日關卡...</div>
+          </div>
+        </div>
+
+        <!-- ── 熱門關卡 2×2 ── -->
+        <div class="park-section" style="max-width:100%">
+          <div class="park-section-header">
+            <span class="park-section-icon">🔥</span>
+            <div>
+              <div class="park-section-kicker">HOT QUESTS</div>
+              <h2 class="park-section-title">熱門關卡</h2>
+            </div>
+            <span class="park-section-badge hot">RANKING</span>
+          </div>
+          <div id="parkHotQuests" class="park-hot-grid">
+            <div class="park-rec-loading" style="grid-column:1/-1">正在同步熱門排行...</div>
+          </div>
+        </div>
+
+        <!-- ── 主題關卡 1×4 ── -->
+        <div class="park-section" style="max-width:100%">
+          <div class="park-section-header">
+            <span class="park-section-icon">🗺️</span>
+            <div>
+              <div class="park-section-kicker">THEME STAGES</div>
+              <h2 class="park-section-title">主題關卡地圖</h2>
+            </div>
+            <span class="park-section-badge theme">EXPLORE</span>
+          </div>
+          <div id="parkThemeQuests" class="park-theme-band">
+            <div class="park-rec-loading" style="grid-column:1/-1">正在整理主題地圖...</div>
+          </div>
+        </div>
+
+        <!-- 高細節模式開放精選雪場 -->
+        <div class="park-section" style="max-width:100%">
+          <div class="park-section-header">
+            <span class="park-section-icon">🎟️</span>
+            <div>
+              <div class="park-section-kicker">FEATURED ROUTES</div>
+              <h2 class="park-section-title">高細節模式開放精選雪場</h2>
+            </div>
+          </div>
+        </div>
+        <div class="park-tickets-section">
+          <div class="park-tickets-label">⛷️ 高細節模式開放精選雪場</div>
+          <div class="park-tickets-grid">
+            <button class="park-ticket" data-color="silver" onclick="parkLoadSymbol('AAPL')">
+              <div class="ticket-dash"></div>
+              <span class="park-ticket-sym">AAPL</span>
+              <span class="park-ticket-name">🍎 科技展示館</span>
+            </button>
+            <button class="park-ticket" data-color="orange" onclick="parkLoadSymbol('AMZN')">
+              <div class="ticket-dash"></div>
+              <span class="park-ticket-sym">AMZN</span>
+              <span class="park-ticket-name">📦 電商雲端城</span>
+            </button>
+            <button class="park-ticket" data-color="rainbow" onclick="parkLoadSymbol('GOOGL')">
+              <div class="ticket-dash"></div>
+              <span class="park-ticket-sym">GOOGL</span>
+              <span class="park-ticket-name">🔍 搜尋資料城</span>
+            </button>
+            <button class="park-ticket" data-color="purple" onclick="parkLoadSymbol('META')">
+              <div class="ticket-dash"></div>
+              <span class="park-ticket-sym">META</span>
+              <span class="park-ticket-name">🌐 社群傳送門</span>
+            </button>
+            <button class="park-ticket" data-color="blue" onclick="parkLoadSymbol('MSFT')">
+              <div class="ticket-dash"></div>
+              <span class="park-ticket-sym">MSFT</span>
+              <span class="park-ticket-name">🪟 雲端雪山</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 三步驟流程 -->
+        <div class="park-steps">
+          <div class="park-step">
+            <div class="park-step-num">1</div>
+            <div class="park-step-icon">🎯</div>
+            <div class="park-step-title">選擇代碼</div>
+            <div class="park-step-desc">輸入任何代碼，系統會生成對應雪場風格</div>
+          </div>
+          <div class="park-step">
+            <div class="park-step-num">2</div>
+            <div class="park-step-icon">🏔️</div>
+            <div class="park-step-title">生成雪道</div>
+            <div class="park-step-desc">走勢轉為滑雪地圖，坡度、體力值與浪潮都會隨地形變化</div>
+          </div>
+          <div class="park-step">
+            <div class="park-step-num">3</div>
+            <div class="park-step-icon">🎿</div>
+            <div class="park-step-title">完成挑戰</div>
+            <div class="park-step-desc">在滑雪挑戰中理解節奏，纜車題目會帶你掌握滑雪技巧</div>
+          </div>
+        </div>
+
+        <!-- 樂園設施說明 -->
+        <div class="park-facilities">
+          <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
+            <span class="park-fac-icon">🕯️</span>
+            <div class="park-fac-name">坡度雪道</div>
+            <div class="park-fac-alias">地形線條</div>
+          </div>
+          <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
+            <span class="park-fac-icon">💪</span>
+            <div class="park-fac-name">體力儀表板</div>
+            <div class="park-fac-alias">節奏強弱</div>
+          </div>
+          <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
+            <span class="park-fac-icon">🌊</span>
+            <div class="park-fac-name">浪潮雷達</div>
+            <div class="park-fac-alias">動能波段</div>
+          </div>
+          <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
+            <span class="park-fac-icon">🚡</span>
+            <div class="park-fac-name">嚮導纜車</div>
+            <div class="park-fac-alias">滑雪技巧問答</div>
+          </div>
+        </div>
+
+      </div><!-- /park-content -->
+    </div><!-- /parkWelcomePage -->
+
+  </main>
+
+  <!-- 個人資料面板（park mode） -->
+  <div id="parkProfilePanel" class="park-profile-panel hidden"></div>
+
+  <!-- 主題關卡流程 Modal -->
+  <div id="parkQuestModalOverlay" class="park-quest-overlay hidden"
+    onclick="if(event.target===this)closeThemeQuest()">
+    <div class="park-quest-modal">
+      <div id="parkQuestModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ═══ 載入順序：levels → difficulty → game → lobby ═══ -->
+  <script src="./levels.js?v=20260620a"></script>
+  <script src="./ski-difficulty.js?v=20260620a"></script>
+  <script src="./ski-game.js?v=20260620a"></script>
+  <script src="./lobby.js?v=20260620a"></script>
+</body>
+
+</html>

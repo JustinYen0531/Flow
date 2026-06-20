@@ -1,0 +1,477 @@
+/* ═══════════════════════════════════════════════
+   ski-game.css  —  Flow Game Overlay Styles
+   ═══════════════════════════════════════════════ */
+
+/* ── 全螢幕 Modal ─────────────────────────────── */
+.ski-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0a0f1e;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  animation: skiModalIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ski-modal.hidden {
+  display: none;
+}
+
+@keyframes skiModalIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Canvas ───────────────────────────────────── */
+#skiCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: none;
+}
+
+#skiCanvas.ski-canvas-show-cursor {
+  cursor: default;
+}
+
+/* ── 關閉按鈕 ─────────────────────────────────── */
+.ski-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: rgba(30, 45, 69, 0.85);
+  color: #94a3b8;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  z-index: 10000;
+}
+
+.ski-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ── 操作提示 ─────────────────────────────────── */
+.ski-hint {
+  position: absolute;
+  bottom: 14px;
+  right: 16px;
+  background: rgba(10, 20, 40, 0.7);
+  color: rgba(148, 163, 184, 0.7);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+/* ── 觸發按鈕（顯示在儀表板上）─────────────────── */
+.ski-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1a2f4e 100%);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 12px;
+  padding: 12px 22px;
+  min-width: 150px;
+  min-height: 44px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+}
+
+.ski-launch-btn:hover {
+  background: linear-gradient(135deg, #1e4a8f 0%, #1a3a6e 100%);
+  border-color: rgba(96, 165, 250, 0.6);
+  color: #93c5fd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.18);
+}
+
+.ski-launch-btn:active {
+  transform: translateY(0);
+}
+
+.ski-launch-btn .ski-btn-icon {
+  font-size: 16px;
+}
+
+.ski-launch-btn .ski-btn-text {
+  line-height: 1;
+}
+
+/* ── 右側大型開始按鈕 ─────────────────────────── */
+.ski-launch-big {
+  padding: 14px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  min-width: 150px;
+  min-height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #0e7490 100%);
+  border-color: rgba(96, 165, 250, 0.6);
+  color: #e0f2fe;
+  box-shadow: 0 0 0 1px rgba(96,165,250,0.2), 0 6px 20px rgba(29,78,216,0.35);
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.ski-launch-big .ski-btn-icon {
+  font-size: 1.2rem;
+}
+.ski-launch-big:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+  border-color: rgba(147, 197, 253, 0.8);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(147,197,253,0.3), 0 8px 28px rgba(29,78,216,0.5);
+  transform: translateY(-2px);
+}
+
+/* ── 按鈕群組（練習 + 開始） ─────────────────── */
+.ski-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  margin-left: 0.18rem;
+}
+
+/* ── 練習模式滑桿面板 ─────────────────────────── */
+.ski-sliders-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(10, 20, 40, 0.55);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-radius: 10px;
+  flex-shrink: 0;
+  min-width: 220px;
+  margin-right: 0;
+}
+
+.ski-medal-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.ski-medal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.24rem;
+  min-width: 76px;
+  min-height: 30px;
+  padding: 0.28rem 0.48rem;
+  background: rgba(15, 24, 37, 0.42);
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  border-radius: 999px;
+  color: rgba(148, 163, 184, 0.42);
+  opacity: 0.55;
+  transition: all 0.22s ease;
+}
+
+.ski-medal.is-earned {
+  opacity: 1;
+  color: #fef3c7;
+  border-color: rgba(250, 204, 21, 0.5);
+  background: linear-gradient(180deg, rgba(120, 53, 15, 0.62), rgba(146, 64, 14, 0.34));
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.14), 0 8px 24px rgba(120,53,15,0.22);
+}
+
+.ski-medal-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.ski-medal-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+}
+
+@media (max-width: 900px) {
+  .ski-medal-group {
+    margin: 0.35rem 0 0;
+  }
+}
+
+.ski-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ski-slider-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(148, 163, 184, 0.85);
+  white-space: nowrap;
+  min-width: 52px;
+}
+
+.ski-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to right,
+    #fbbf24 0%,
+    #fbbf24 calc(var(--val, 40) * 1%),
+    rgba(30, 45, 69, 0.8) calc(var(--val, 40) * 1%),
+    rgba(30, 45, 69, 0.8) 100%
+  );
+  outline: none;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+/* 讓進度色跟隨 value，用 JS 更新 CSS 變數 */
+#steepnessSlider { --val: 100; }
+#hitboxSlider    { --val: 1; }
+
+.ski-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fbbf24;
+  border: 2px solid #0f1825;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ski-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
+}
+.ski-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fbbf24;
+  border: 2px solid #0f1825;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+  cursor: pointer;
+}
+
+.ski-slider-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fbbf24;
+  min-width: 24px;
+  text-align: right;
+}
+
+.ski-slider-preset-row {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
+}
+
+.ski-preset-btn {
+  background: rgba(30, 45, 69, 0.7);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 6px;
+  color: rgba(148, 163, 184, 0.85);
+  font-size: 0.7rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.ski-preset-btn:hover {
+  border-color: rgba(96, 165, 250, 0.6);
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.12);
+}
+/* 正常難度按鈕特殊樣式：帶點藍色強調 */
+.ski-preset-normal {
+  border-color: rgba(96, 165, 250, 0.4);
+  color: #93c5fd;
+}
+.ski-preset-normal:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(96, 165, 250, 0.8);
+  color: #bfdbfe;
+}
+
+/* 區間數字輸入框 */
+.ski-range-row { gap: 0.35rem; }
+
+.ski-range-num {
+  width: 44px;
+  background: rgba(15, 24, 37, 0.8);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 6px;
+  color: #fbbf24;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 4px;
+  outline: none;
+  transition: border-color 0.15s;
+  /* 隱藏數字輸入框的上下箭頭 */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.ski-range-num::-webkit-inner-spin-button,
+.ski-range-num::-webkit-outer-spin-button { -webkit-appearance: none; }
+.ski-range-num:focus {
+  border-color: rgba(251, 191, 36, 0.6);
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.12);
+}
+
+.ski-range-sep {
+  font-size: 0.72rem;
+  color: rgba(148, 163, 184, 0.6);
+  white-space: nowrap;
+}
+
+/* ── 練習模式按鈕（黃橘色系） ─────────────────── */
+.ski-practice-btn {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  border-color: rgba(251, 191, 36, 0.45);
+  color: #fde68a;
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.15), 0 4px 14px rgba(120,53,15,0.3);
+  padding: 14px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  min-height: 52px;
+  border-radius: 14px;
+  letter-spacing: 0.02em;
+}
+.ski-practice-btn:hover {
+  background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+  border-color: rgba(251, 191, 36, 0.7);
+  color: #fef3c7;
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.3), 0 6px 20px rgba(180,83,9,0.4);
+  transform: translateY(-2px);
+}
+
+.ski-launch-big.ski-launch-practice {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  border-color: rgba(251, 191, 36, 0.45);
+  color: #fde68a;
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.15), 0 4px 14px rgba(120,53,15,0.3);
+}
+
+.ski-launch-big.ski-launch-practice:hover {
+  background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+  border-color: rgba(251, 191, 36, 0.7);
+  color: #fef3c7;
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.3), 0 6px 20px rgba(180,83,9,0.4);
+}
+
+/* ── 儀表板視覺細節切換 (Lobby Detail Toggle) ─────────────────── */
+.ski-detail-toggle-lobby {
+  background: rgba(30, 45, 69, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  color: rgba(148, 163, 184, 0.85);
+  font-size: 0.7rem;
+  font-family: inherit;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ski-detail-toggle-lobby:hover {
+  border-color: rgba(94, 163, 250, 0.6);
+  color: #fff;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.ski-detail-toggle-lobby.active {
+  background: linear-gradient(135deg, #6b21a8 0%, #4c1d95 100%);
+  color: #fff;
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+
+.ski-detail-toggle-lobby.active::before {
+  content: '✨';
+  font-size: 10px;
+}
+
+/* ── 視覺細節切換按鈕 (Detail Toggle) ─────────────────── */
+.ski-detail-toggle {
+  display: none; /* 隱藏遊戲內按鈕，因為我們改用大廳控制 */
+  position: absolute;
+  bottom: 0px;
+  right: 180px; /* 避開右側的提示文字 */
+  background: rgba(30, 45, 69, 0.85);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-bottom: none; /* 書籤感：底部貼齊不留邊 */
+  border-radius: 8px 8px 0 0;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10000;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+}
+
+.ski-detail-toggle:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  background: rgba(59, 130, 246, 0.4);
+  border-color: rgba(94, 163, 250, 0.6);
+}
+
+.ski-detail-toggle.active {
+  background: linear-gradient(180deg, #6b21a8 0%, #4c1d95 100%); /* 深紫色 */
+  color: #f5f3ff;
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 -4px 20px rgba(168, 85, 247, 0.3);
+}
+
+.ski-detail-toggle.active::before {
+  content: '✨';
+  font-size: 14px;
+}
+
+.ski-detail-toggle .detail-label {
+  letter-spacing: 0.05em;
+}

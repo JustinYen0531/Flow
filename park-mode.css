@@ -1658,12 +1658,7 @@ body.park-mode .ski-action-title { color: var(--park-orange); }
    把深色專業風格的 input / select / 分析按鈕 改為冰晶玻璃 + 橙色
    ═══════════════════════════════════════════════════════════ */
 
-/* Logo 圖示換成滑雪人 */
 body.park-mode .logo-icon {
-  font-size: 0;
-}
-body.park-mode .logo-icon::before {
-  content: '⛷️';
   font-size: 1.4rem;
 }
 /* Logo 文字 → 冰藍/青色漸層 */
@@ -1737,7 +1732,7 @@ body.park-mode .stock-header-card {
 }
 /* "QUEST IN PROGRESS" kicker */
 body.park-mode .stock-header-card::before {
-  content: '⚔️  QUEST IN PROGRESS';
+  content: 'QUEST IN PROGRESS';
   position: absolute;
   top: 0; left: 0; right: 0;
   padding: 0.55rem 1.4rem;
@@ -1827,7 +1822,7 @@ body.park-mode .ski-launch-big {
 /* Difficulty label → game language */
 body.park-mode .ski-difficulty-label { font-size: 0 !important; }
 body.park-mode .ski-difficulty-label::before {
-  content: '🏔️ 雪道難度';
+  content: '雪道難度';
   font-size: 0.70rem;
   color: rgba(180,210,255,0.60);
   font-weight: 700;
@@ -1841,7 +1836,7 @@ body.park-mode .education-preview-card {
 }
 body.park-mode .education-preview-kicker { font-size: 0 !important; }
 body.park-mode .education-preview-kicker::before {
-  content: '🗺️  任務地形簡報';
+  content: '任務地形簡報';
   font-size: 0.70rem;
   font-weight: 900;
   color: rgba(0,207,170,0.80);
@@ -1889,7 +1884,7 @@ body.park-mode .advice-icon {
 /* NPC name replace */
 body.park-mode .advice-title { font-size: 0 !important; }
 body.park-mode .advice-title::before {
-  content: '⛷️ AI 嚮導';
+  content: 'AI 嚮導';
   font-size: 1rem;
   font-weight: 900;
   color: #fff;
@@ -3041,5 +3036,269 @@ body.park-mode .ski-difficulty-panel {
     flex-direction: row !important;
     flex-wrap: wrap;
     justify-content: center !important;
+  }
+}
+
+/* Monochrome landing refresh: calmer black/white palette, no high-saturation accents. */
+:root {
+  --park-orange: #f5f5f5;
+  --park-orange-d: #d6d6d6;
+  --park-orange-glow: rgba(255, 255, 255, 0.14);
+  --park-teal: #eeeeee;
+  --park-teal-glow: rgba(255, 255, 255, 0.12);
+  --park-sky-deep: #050505;
+  --park-sky-mid: #101010;
+  --park-sky-bright: #242424;
+  --park-snow-pale: #e8e8e8;
+  --park-glass: rgba(255, 255, 255, 0.055);
+  --park-glass-b: rgba(255, 255, 255, 0.16);
+  --park-glass-thick: rgba(255, 255, 255, 0.09);
+  --park-text-ice: #f4f4f4;
+  --park-text-mist: rgba(232, 232, 232, 0.68);
+  --park-shadow: 0 12px 34px rgba(0, 0, 0, 0.36);
+  --park-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.48);
+}
+
+body.park-mode {
+  background: linear-gradient(180deg, #040404 0%, #111111 52%, #242424 100%) fixed !important;
+}
+
+body.park-mode::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%) !important;
+}
+
+body.park-mode .header,
+body.park-mode .footer {
+  background: rgba(6, 6, 6, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.park-mode .logo-text {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: #f3f3f3 !important;
+}
+
+body.park-mode .park-sky {
+  background: linear-gradient(180deg, #050505 0%, #101010 48%, #252525 100%) !important;
+}
+
+body.park-mode .park-aurora,
+body.park-mode .park-stars {
+  display: none !important;
+}
+
+body.park-mode .park-mtn-svg {
+  opacity: 0.48;
+  filter: grayscale(1) contrast(0.92) brightness(0.74);
+}
+
+body.park-mode .park-mtn-svg path:nth-of-type(1),
+body.park-mode .park-mtn-svg path:nth-of-type(5),
+body.park-mode .park-mtn-svg path:nth-of-type(9) {
+  fill: #111111 !important;
+}
+
+body.park-mode .park-mtn-svg path:nth-of-type(10),
+body.park-mode .park-mtn-svg path:nth-of-type(11) {
+  fill: #d8d8d8 !important;
+}
+
+body.park-mode .park-snow-canvas {
+  opacity: 0.18;
+}
+
+body.park-mode .park-ski-char {
+  animation: none !important;
+  filter: grayscale(1) drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+  opacity: 0.86;
+}
+
+body.park-mode .park-title {
+  color: #ffffff !important;
+  letter-spacing: 0 !important;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.42) !important;
+}
+
+body.park-mode .park-title .hl-gold,
+body.park-mode .park-title .hl-ice {
+  background: none !important;
+  -webkit-text-fill-color: #ffffff !important;
+  filter: none !important;
+}
+
+body.park-mode .park-subtitle {
+  color: rgba(245, 245, 245, 0.74) !important;
+  text-shadow: none !important;
+}
+
+body.park-mode .park-badge,
+body.park-mode .park-section-badge,
+body.park-mode .park-quest-chip,
+body.park-mode .park-victory-cond,
+body.park-mode .park-theme-pick {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: rgba(245, 245, 245, 0.82) !important;
+  box-shadow: none !important;
+}
+
+body.park-mode .park-section-kicker,
+body.park-mode .park-victory-label,
+body.park-mode .park-daily-symbol,
+body.park-mode .park-theme-prog-label {
+  color: rgba(245, 245, 245, 0.66) !important;
+  text-shadow: none !important;
+}
+
+body.park-mode .park-booth,
+body.park-mode .park-daily-card,
+body.park-mode .park-hot-card,
+body.park-mode .park-theme-card,
+body.park-mode .park-step,
+body.park-mode .park-facility,
+body.park-mode .park-picker-panel {
+  background: rgba(12, 12, 12, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: var(--park-shadow) !important;
+}
+
+body.park-mode .park-booth {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+body.park-mode .park-daily-card::before,
+body.park-mode .park-hot-card::before,
+body.park-mode .park-theme-card::before {
+  display: none !important;
+}
+
+body.park-mode .park-daily-card:hover,
+body.park-mode .park-hot-card:hover,
+body.park-mode .park-theme-card:hover,
+body.park-mode .park-ticket:hover,
+body.park-mode .park-step:hover,
+body.park-mode .park-facility:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34) !important;
+}
+
+body.park-mode .park-input,
+body.park-mode .park-period,
+body.park-mode .park-picker-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #f2f2f2 !important;
+  box-shadow: none !important;
+}
+
+body.park-mode .park-input:focus,
+body.park-mode .park-period:focus,
+body.park-mode .park-picker-btn:hover {
+  border-color: rgba(255, 255, 255, 0.44) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08) !important;
+}
+
+body.park-mode .park-period option {
+  background: #111111 !important;
+  color: #f2f2f2 !important;
+}
+
+body.park-mode .park-start-btn,
+body.park-mode .park-daily-btn,
+body.park-mode .park-hot-btn,
+body.park-mode .park-theme-btn {
+  background: #f4f4f4 !important;
+  border: 1px solid #f4f4f4 !important;
+  color: #080808 !important;
+  box-shadow: none !important;
+}
+
+body.park-mode .park-start-btn:hover,
+body.park-mode .park-daily-btn:hover,
+body.park-mode .park-hot-btn:hover,
+body.park-mode .park-theme-btn:hover {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26) !important;
+}
+
+body.park-mode .park-ticket,
+body.park-mode .park-ticket[data-color] {
+  background: linear-gradient(145deg, #1a1a1a 0%, #303030 100%) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  filter: grayscale(1);
+}
+
+body.park-mode .park-ticket[data-color]:hover {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.park-mode .park-ticket::before,
+body.park-mode .park-ticket::after {
+  background: rgba(0, 0, 0, 0.42) !important;
+}
+
+body.park-mode .park-daily-thumb,
+body.park-mode .park-daily-thumb-bg,
+body.park-mode .park-daily-thumb-spark,
+body.park-mode .homepage-stock-video,
+body.park-mode .homepage-stock-surface {
+  filter: grayscale(1) saturate(0) contrast(0.9) brightness(0.78) !important;
+}
+
+body.park-mode .park-hot-card.is-up,
+body.park-mode .park-hot-card.is-down {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+body.park-mode .park-hot-change,
+body.park-mode .park-hot-card.is-up .park-hot-change,
+body.park-mode .park-hot-card.is-down .park-hot-change,
+body.park-mode .park-theme-prog-fill {
+  color: #f0f0f0 !important;
+  background: #d8d8d8 !important;
+}
+
+body.park-mode .park-hot-rank,
+body.park-mode .park-hot-rank.rank-1,
+body.park-mode .park-hot-rank.rank-2,
+body.park-mode .park-hot-rank.rank-3 {
+  background: #e8e8e8 !important;
+  color: #080808 !important;
+  box-shadow: none !important;
+}
+
+body.park-mode .park-theme-card-icon,
+body.park-mode .park-section-icon,
+body.park-mode .park-booth-icon,
+body.park-mode .park-step-icon,
+body.park-mode .park-fac-icon,
+body.park-mode .park-profile-btn span:first-child {
+  filter: grayscale(1);
+  opacity: 0.82;
+}
+
+body.park-mode .park-profile-btn,
+body.park-mode .park-pp-inner,
+body.park-mode .park-quest-modal-content {
+  background: rgba(12, 12, 12, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: var(--park-shadow-lg) !important;
+}
+
+@media (max-width: 640px) {
+  body.park-mode .park-content {
+    gap: 1.6rem;
+    padding-top: 2rem;
+  }
+
+  body.park-mode .park-booth,
+  body.park-mode .park-daily-card {
+    padding: 1.15rem !important;
   }
 }

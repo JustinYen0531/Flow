@@ -22,7 +22,10 @@
   <header class="header">
     <div class="header-inner">
       <div class="logo" onclick="returnToHome()" title="點擊返回首頁">
-        <span class="logo-icon">⛷️</span>
+        <span class="logo-icon park-html-icon park-html-icon-ski" aria-hidden="true">
+          <span class="park-html-icon-body"></span>
+          <span class="park-html-icon-line"></span>
+        </span>
         <span class="logo-text">Flow</span>
         <span class="logo-sub">滑雪冒險</span>
       </div>
@@ -34,7 +37,10 @@
       </div>
       <!-- 個人資料按鈕 -->
       <button class="park-profile-btn" id="parkProfileBtn" onclick="toggleParkProfile()">
-        <span>⛷️</span>
+        <span class="park-html-icon park-html-icon-ski" aria-hidden="true">
+          <span class="park-html-icon-body"></span>
+          <span class="park-html-icon-line"></span>
+        </span>
         <span id="parkProfileLabel">冒險者</span>
       </button>
     </div>
@@ -100,10 +106,13 @@
 
         <!-- HERO -->
         <div class="park-hero">
-          <span class="park-ski-char">⛷️</span>
+          <span class="park-ski-char park-html-icon park-html-icon-ski" aria-hidden="true">
+            <span class="park-html-icon-body"></span>
+            <span class="park-html-icon-line"></span>
+          </span>
 
           <div class="park-badge-row">
-            <span class="park-badge teal">✨ Adventure Mode</span>
+            <span class="park-badge teal">Adventure Mode</span>
             <span class="park-badge ghost">Beta</span>
           </div>
 
@@ -119,7 +128,7 @@
         <!-- 售票亭 -->
         <div class="park-booth">
           <div class="park-booth-header">
-            <span class="park-booth-icon">🎟️</span>
+            <span class="park-booth-icon park-html-icon park-html-icon-ticket" aria-hidden="true"><span></span></span>
             <span class="park-booth-title">售票亭 · 輸入雪場代碼</span>
           </div>
           <div class="park-booth-row" style="position:relative">
@@ -134,7 +143,7 @@
               <option value="2y">2 年</option>
             </select>
             <button class="park-start-btn" onclick="parkStartAdventure()">
-              🎿 開始探索！
+              開始探索！
             </button>
             <!-- 售票亭代碼選單 -->
             <div id="parkPickerPanel" class="park-picker-panel hidden"></div>
@@ -144,7 +153,7 @@
         <!-- ── 每日關卡（全寬 featured）── -->
         <div class="park-section" style="max-width:100%">
           <div class="park-section-header">
-            <span class="park-section-icon">📅</span>
+            <span class="park-section-icon park-html-icon park-html-icon-calendar" aria-hidden="true"><span></span></span>
             <div>
               <div class="park-section-kicker">TODAY'S QUEST</div>
               <h2 class="park-section-title">每日關卡</h2>
@@ -159,7 +168,7 @@
         <!-- ── 熱門關卡 2×2 ── -->
         <div class="park-section" style="max-width:100%">
           <div class="park-section-header">
-            <span class="park-section-icon">🔥</span>
+            <span class="park-section-icon park-html-icon park-html-icon-rank" aria-hidden="true"><span></span></span>
             <div>
               <div class="park-section-kicker">HOT QUESTS</div>
               <h2 class="park-section-title">熱門關卡</h2>
@@ -174,7 +183,7 @@
         <!-- ── 主題關卡 1×4 ── -->
         <div class="park-section" style="max-width:100%">
           <div class="park-section-header">
-            <span class="park-section-icon">🗺️</span>
+            <span class="park-section-icon park-html-icon park-html-icon-map" aria-hidden="true"><span></span></span>
             <div>
               <div class="park-section-kicker">THEME STAGES</div>
               <h2 class="park-section-title">主題關卡地圖</h2>
@@ -189,7 +198,7 @@
         <!-- 高細節模式開放精選雪場 -->
         <div class="park-section" style="max-width:100%">
           <div class="park-section-header">
-            <span class="park-section-icon">🎟️</span>
+            <span class="park-section-icon park-html-icon park-html-icon-ticket" aria-hidden="true"><span></span></span>
             <div>
               <div class="park-section-kicker">FEATURED ROUTES</div>
               <h2 class="park-section-title">高細節模式開放精選雪場</h2>
@@ -197,32 +206,32 @@
           </div>
         </div>
         <div class="park-tickets-section">
-          <div class="park-tickets-label">⛷️ 高細節模式開放精選雪場</div>
+          <div class="park-tickets-label">高細節模式開放精選雪場</div>
           <div class="park-tickets-grid">
             <button class="park-ticket" data-color="silver" onclick="parkLoadSymbol('AAPL')">
               <div class="ticket-dash"></div>
               <span class="park-ticket-sym">AAPL</span>
-              <span class="park-ticket-name">🍎 科技展示館</span>
+              <span class="park-ticket-name">科技展示館</span>
             </button>
             <button class="park-ticket" data-color="orange" onclick="parkLoadSymbol('AMZN')">
               <div class="ticket-dash"></div>
               <span class="park-ticket-sym">AMZN</span>
-              <span class="park-ticket-name">📦 電商雲端城</span>
+              <span class="park-ticket-name">電商雲端城</span>
             </button>
             <button class="park-ticket" data-color="rainbow" onclick="parkLoadSymbol('GOOGL')">
               <div class="ticket-dash"></div>
               <span class="park-ticket-sym">GOOGL</span>
-              <span class="park-ticket-name">🔍 搜尋資料城</span>
+              <span class="park-ticket-name">搜尋資料城</span>
             </button>
             <button class="park-ticket" data-color="purple" onclick="parkLoadSymbol('META')">
               <div class="ticket-dash"></div>
               <span class="park-ticket-sym">META</span>
-              <span class="park-ticket-name">🌐 社群傳送門</span>
+              <span class="park-ticket-name">社群傳送門</span>
             </button>
             <button class="park-ticket" data-color="blue" onclick="parkLoadSymbol('MSFT')">
               <div class="ticket-dash"></div>
               <span class="park-ticket-sym">MSFT</span>
-              <span class="park-ticket-name">🪟 雲端雪山</span>
+              <span class="park-ticket-name">雲端雪山</span>
             </button>
           </div>
         </div>
@@ -231,19 +240,19 @@
         <div class="park-steps">
           <div class="park-step">
             <div class="park-step-num">1</div>
-            <div class="park-step-icon">🎯</div>
+            <div class="park-step-icon park-html-icon park-html-icon-target" aria-hidden="true"><span></span></div>
             <div class="park-step-title">選擇代碼</div>
             <div class="park-step-desc">輸入任何代碼，系統會生成對應雪場風格</div>
           </div>
           <div class="park-step">
             <div class="park-step-num">2</div>
-            <div class="park-step-icon">🏔️</div>
+            <div class="park-step-icon park-html-icon park-html-icon-mountain" aria-hidden="true"><span></span></div>
             <div class="park-step-title">生成雪道</div>
             <div class="park-step-desc">走勢轉為滑雪地圖，坡度、體力值與浪潮都會隨地形變化</div>
           </div>
           <div class="park-step">
             <div class="park-step-num">3</div>
-            <div class="park-step-icon">🎿</div>
+            <div class="park-step-icon park-html-icon park-html-icon-ski" aria-hidden="true"><span class="park-html-icon-body"></span><span class="park-html-icon-line"></span></div>
             <div class="park-step-title">完成挑戰</div>
             <div class="park-step-desc">在滑雪挑戰中理解節奏，纜車題目會帶你掌握滑雪技巧</div>
           </div>
@@ -252,22 +261,22 @@
         <!-- 樂園設施說明 -->
         <div class="park-facilities">
           <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
-            <span class="park-fac-icon">🕯️</span>
+            <span class="park-fac-icon park-html-icon park-html-icon-candle" aria-hidden="true"><span></span></span>
             <div class="park-fac-name">坡度雪道</div>
             <div class="park-fac-alias">地形線條</div>
           </div>
           <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
-            <span class="park-fac-icon">💪</span>
+            <span class="park-fac-icon park-html-icon park-html-icon-strength" aria-hidden="true"><span></span></span>
             <div class="park-fac-name">體力儀表板</div>
             <div class="park-fac-alias">節奏強弱</div>
           </div>
           <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
-            <span class="park-fac-icon">🌊</span>
+            <span class="park-fac-icon park-html-icon park-html-icon-wave" aria-hidden="true"><span></span></span>
             <div class="park-fac-name">浪潮雷達</div>
             <div class="park-fac-alias">動能波段</div>
           </div>
           <div class="park-facility" onclick="parkLoadSymbol(document.getElementById('parkSymbolInput').value||'NVDA')">
-            <span class="park-fac-icon">🚡</span>
+            <span class="park-fac-icon park-html-icon park-html-icon-lift" aria-hidden="true"><span></span></span>
             <div class="park-fac-name">嚮導纜車</div>
             <div class="park-fac-alias">滑雪技巧問答</div>
           </div>

@@ -18,6 +18,14 @@ function _escHtml(str) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function _parkHtmlIcon(type) {
+  const safeType = String(type || 'dot').replace(/[^a-z0-9_-]/gi, '');
+  if (safeType === 'ski') {
+    return `<span class="park-html-icon park-html-icon-ski" aria-hidden="true"><span class="park-html-icon-body"></span><span class="park-html-icon-line"></span></span>`;
+  }
+  return `<span class="park-html-icon park-html-icon-${safeType}" aria-hidden="true"><span></span></span>`;
+}
+
 function _getSymbolTheme(sym) {
   const palette = [
     ['#00cfaa', '#0080c0'], ['#ff7043', '#d32f2f'],
@@ -60,13 +68,13 @@ function buildParkDailyQuest() {
     `<span class="park-quest-chip ${_escHtml(c.tone || '')}">${_escHtml(c.label)}</span>`
   ).join('');
   const reasons = (f.reasons || []).map(r =>
-    `<span class="park-victory-cond">✓ ${_escHtml(r)}</span>`
+    `<span class="park-victory-cond"><span class="park-inline-mark" aria-hidden="true"></span>${_escHtml(r)}</span>`
   ).join('');
   const diff = Math.min(5, Math.max(2, (f.chips?.length || 3)));
-  const stars = '★'.repeat(diff) + '☆'.repeat(5 - diff);
+  const difficultyLabel = `Level ${diff}/5`;
   const [c1, c2] = _getSymbolTheme(f.symbol || '');
   const spark = _buildSparklineSvg(f.series || []);
-  const icon = (f.chips || []).length > 3 ? '🔥' : '⛷️';
+  const icon = _parkHtmlIcon((f.chips || []).length > 3 ? 'rank' : 'ski');
   return `
     <div class="park-daily-card" onclick="parkLoadSymbol('${_escHtml(f.symbol)}')">
       <div class="park-daily-thumb">
@@ -91,18 +99,18 @@ function buildParkDailyQuest() {
         <p class="park-daily-summary">${_escHtml(f.summary || f.detail || '')}</p>
         <div class="park-daily-chips">${chips}</div>
         <div>
-          <span class="park-victory-label">🏆 勝利條件</span>
+          <span class="park-victory-label">勝利條件</span>
           <div class="park-victory-list">${reasons}</div>
         </div>
       </div>
       <div class="park-daily-right">
         <div>
           <div class="park-daily-diff-label">關卡難度</div>
-          <div class="park-daily-stars">${stars}</div>
+          <div class="park-daily-stars">${difficultyLabel}</div>
         </div>
         <button class="park-daily-btn"
           onclick="event.stopPropagation();parkLoadSymbol('${_escHtml(f.symbol)}')">
-          🎿 進入今日關卡
+          進入今日關卡
         </button>
       </div>
     </div>`;
@@ -124,7 +132,7 @@ function buildParkHotQuests() {
       <p class="park-hot-blurb">${_escHtml(item.blurb || '')}</p>
       <button class="park-hot-btn"
         onclick="event.stopPropagation();parkLoadSymbol('${_escHtml(item.symbol)}')">
-        ⚔️ 挑戰
+        挑戰
       </button>
     </div>`).join('');
 }
@@ -132,7 +140,7 @@ function buildParkHotQuests() {
 /* ════════════ 4. 主題關卡定義（原樣保留） ════════════ */
 const _PARK_THEME_DEFS = [
   {
-    id: 'ai_chip', title: 'AI 晶片', icon: '🧠',
+    id: 'ai_chip', title: 'AI 晶片', icon: 'chip',
     desc: '聚焦算力與伺服器 GPU 主線，探索 AI 晶片供應鏈從設計到封裝的完整生態。',
     stages: [
       { sym: 'NVDA',    name: 'Nvidia',   disp: 'NVDA', desc: 'AI GPU 算力核心，全球市場領頭羊' },
@@ -144,7 +152,7 @@ const _PARK_THEME_DEFS = [
     ]
   },
   {
-    id: 'us_tech', title: '美股科技', icon: '💻',
+    id: 'us_tech', title: '美股科技', icon: 'tech',
     desc: '從 FAANG 到 AI 轉型股，逐一解鎖美國科技龍頭的核心競爭力。',
     stages: [
       { sym: 'AAPL',  name: 'Apple',     disp: 'AAPL',  desc: '消費電子生態護城河，Apple Intelligence 押注' },
@@ -156,7 +164,7 @@ const _PARK_THEME_DEFS = [
     ]
   },
   {
-    id: 'tw_dragon', title: '台灣龍頭', icon: '🇹🇼',
+    id: 'tw_dragon', title: '台灣龍頭', icon: 'tw',
     desc: '台灣半導體護城河，從晶圓代工到 AI 伺服器供應鏈全面制霸。',
     stages: [
       { sym: '2330.TW', name: '台積電', disp: '2330', desc: '全球晶圓代工霸主，先進製程護城河無人能敵' },
@@ -168,7 +176,7 @@ const _PARK_THEME_DEFS = [
     ]
   },
   {
-    id: 'ev', title: '電動車', icon: '⚡',
+    id: 'ev', title: '電動車', icon: 'ev',
     desc: '最能反映市場情緒起伏的題材，從領頭羊到新能源全面解鎖。',
     stages: [
       { sym: 'TSLA', name: 'Tesla',      disp: 'TSLA', desc: '電動車龍頭，FSD 自動駕駛 + Robotaxi 催化' },
@@ -195,7 +203,7 @@ function buildParkThemeQuests() {
     ).join('');
     return `
       <div class="park-theme-card${allDone ? ' is-complete' : ''}" onclick="openThemeQuest(${idx})">
-        <div class="park-theme-card-icon">${_escHtml(theme.icon)}${allDone ? '<span class="park-theme-crown">👑</span>' : ''}</div>
+        <div class="park-theme-card-icon">${_parkHtmlIcon(theme.icon)}${allDone ? '<span class="park-theme-crown">Done</span>' : ''}</div>
         <div class="park-theme-card-title">${_escHtml(theme.title)}</div>
         <div class="park-theme-card-desc">${_escHtml(theme.desc)}</div>
         <div class="park-theme-prog-bar">
@@ -205,7 +213,7 @@ function buildParkThemeQuests() {
         <div class="park-theme-picks">${picks}</div>
         <button class="park-theme-btn"
           onclick="event.stopPropagation();openThemeQuest(${idx})">
-          🗺️ 探索關卡
+          探索關卡
         </button>
       </div>`;
   }).join('');
@@ -254,15 +262,15 @@ function _buildQuestModal(idx) {
     const isActive = !isDone && (i === 0 || visitedSyms.has(theme.stages[i - 1].sym));
     const isLocked = !isDone && !isActive;
     const cls = isDone ? 'done' : isActive ? 'active' : 'locked';
-    const ind = isDone ? '✓' : isActive ? '▶' : '🔒';
+    const ind = isDone ? 'Done' : isActive ? 'Next' : 'Lock';
     const action = isDone
-      ? `<span class="park-quest-stage-done-label">✓ 已完成</span>`
+      ? `<span class="park-quest-stage-done-label">已完成</span>`
       : isActive
         ? `<button class="park-quest-stage-btn"
              onclick="_enterThemeStage('${_escHtml(s.sym)}','${_escHtml(s.name)}',${idx})">
-             ⛷️ 進入關卡
+             進入關卡
            </button>`
-        : `<span class="park-quest-stage-locked-label">🔒 請先完成上一關</span>`;
+        : `<span class="park-quest-stage-locked-label">請先完成上一關</span>`;
     const connector = i < theme.stages.length - 1
       ? `<div class="park-quest-connector"></div>` : '';
     return `
@@ -285,17 +293,17 @@ function _buildQuestModal(idx) {
 
   const completeBanner = allDone
     ? `<div class="park-quest-complete-banner">
-         🎉 恭喜完成「${_escHtml(theme.title)}」主題全 ${total} 關！獲得專屬勳章 ${_escHtml(theme.icon)}
+         恭喜完成「${_escHtml(theme.title)}」主題全 ${total} 關！獲得專屬勳章
        </div>` : '';
 
   document.getElementById('parkQuestModalContent').innerHTML = `
     <div class="park-quest-modal-header">
-      <div class="park-quest-modal-icon">${_escHtml(theme.icon)}</div>
+      <div class="park-quest-modal-icon">${_parkHtmlIcon(theme.icon)}</div>
       <div>
         <div class="park-quest-modal-title">${_escHtml(theme.title)} 主題關卡</div>
         <div class="park-quest-modal-desc">${_escHtml(theme.desc)}</div>
       </div>
-      <button class="park-quest-modal-close" onclick="closeThemeQuest()">✕</button>
+      <button class="park-quest-modal-close" onclick="closeThemeQuest()">X</button>
     </div>
     <div class="park-quest-progress-section">
       <div class="park-quest-prog-bar">
@@ -316,44 +324,44 @@ function _enterThemeStage(sym, name, themeIdx) {
 
 /* ════════════ 6. 售票亭選股面板（原樣保留） ════════════ */
 const _PARK_STOCKS = [
-  { cat: '💻 美國科技', stocks: [
+  { cat: '美國科技', stocks: [
     { sym: 'AAPL', name: 'Apple' }, { sym: 'MSFT', name: 'Microsoft' },
     { sym: 'GOOGL', name: 'Google' }, { sym: 'META', name: 'Meta' },
     { sym: 'AMZN', name: 'Amazon' }, { sym: 'NFLX', name: 'Netflix' },
     { sym: 'NVDA', name: 'Nvidia' }, { sym: 'AMD', name: 'AMD' },
     { sym: 'CRM', name: 'Salesforce' }, { sym: 'ORCL', name: 'Oracle' },
   ]},
-  { cat: '⚙️ 半導體', stocks: [
+  { cat: '半導體', stocks: [
     { sym: 'QCOM', name: 'Qualcomm' }, { sym: 'INTC', name: 'Intel' },
     { sym: 'AVGO', name: 'Broadcom' }, { sym: 'MU', name: 'Micron' },
     { sym: 'AMAT', name: 'Applied Materials' }, { sym: 'LRCX', name: 'Lam Research' },
   ]},
-  { cat: '⚡ 電動車/新能源', stocks: [
+  { cat: '電動車/新能源', stocks: [
     { sym: 'TSLA', name: 'Tesla' }, { sym: 'RIVN', name: 'Rivian' },
     { sym: 'LCID', name: 'Lucid Motors' }, { sym: 'NIO', name: '蔚來 NIO' },
     { sym: 'ENPH', name: 'Enphase' }, { sym: 'PLUG', name: 'Plug Power' },
   ]},
-  { cat: '🏦 商務服務', stocks: [
+  { cat: '商務服務', stocks: [
     { sym: 'JPM', name: 'JPMorgan' }, { sym: 'BAC', name: 'Bank of America' },
     { sym: 'GS', name: 'Goldman Sachs' }, { sym: 'V', name: 'Visa' },
     { sym: 'MA', name: 'Mastercard' }, { sym: 'BRK-B', name: 'Berkshire B' },
   ]},
-  { cat: '🇹🇼 台灣科技', stocks: [
+  { cat: '台灣科技', stocks: [
     { sym: '2330.TW', name: '台積電', disp: '2330' }, { sym: '2317.TW', name: '鴻海', disp: '2317' },
     { sym: '2454.TW', name: '聯發科', disp: '2454' }, { sym: '2303.TW', name: '聯電', disp: '2303' },
     { sym: '2308.TW', name: '台達電', disp: '2308' }, { sym: '3711.TW', name: '日月光', disp: '3711' },
     { sym: '2382.TW', name: '廣達', disp: '2382' }, { sym: '2395.TW', name: '研華', disp: '2395' },
   ]},
-  { cat: '📦 台灣 ETF', stocks: [
+  { cat: '台灣 ETF', stocks: [
     { sym: '0050.TW', name: '台灣50', disp: '0050' }, { sym: '0056.TW', name: '高股息', disp: '0056' },
     { sym: '006208.TW', name: '富邦台50', disp: '006208' }, { sym: '00878.TW', name: '國泰永續高股息', disp: '00878' },
     { sym: '00919.TW', name: '群益高息', disp: '00919' }, { sym: '00929.TW', name: '復華科技優息', disp: '00929' },
   ]},
-  { cat: '🛢️ 能源/原物料', stocks: [
+  { cat: '能源/原物料', stocks: [
     { sym: 'XOM', name: 'ExxonMobil' }, { sym: 'CVX', name: 'Chevron' },
     { sym: 'COP', name: 'ConocoPhillips' }, { sym: 'GLD', name: '黃金 ETF' }, { sym: 'SLV', name: '白銀 ETF' },
   ]},
-  { cat: '🐉 中概股', stocks: [
+  { cat: '中概股', stocks: [
     { sym: 'BABA', name: '阿里巴巴' }, { sym: 'PDD', name: '拼多多' },
     { sym: 'JD', name: '京東' }, { sym: 'BIDU', name: '百度' },
   ]},
@@ -365,7 +373,7 @@ function _renderParkPicker(q) {
   const panel = document.getElementById('parkPickerPanel');
   if (!panel) return;
   q = (q || '').toLowerCase().trim();
-  let html = `<div class="park-picker-hint">⛷️ 選擇雪場 · 或直接輸入代碼後按 Enter</div>`;
+  let html = `<div class="park-picker-hint">${_parkHtmlIcon('ski')}<span>選擇雪場 · 或直接輸入代碼後按 Enter</span></div>`;
   let anyResult = false;
   _PARK_STOCKS.forEach(({ cat, stocks }) => {
     const btns = stocks.map(s => {
@@ -392,7 +400,7 @@ function _renderParkPicker(q) {
   });
   if (!anyResult) {
     html += `<div class="park-picker-hint" style="color:rgba(255,180,100,0.6);padding:0.6rem 0.4rem">
-      找不到「${_escHtml(q)}」，直接按 🎿 開始探索！</div>`;
+      找不到「${_escHtml(q)}」，直接按開始探索！</div>`;
   }
   panel.innerHTML = html;
 }
@@ -469,14 +477,14 @@ function renderParkProfile() {
   const explored = questLog.length;
   const visits = questLog.reduce((sum, q) => sum + (q.count || 1), 0);
   const bestSki = progress.bestSkiScore || 0;
-  const level = explored >= 20 ? '⛷️ 滑雪大師' :
-    explored >= 10 ? '🎿 中級滑手' :
-      explored >= 3 ? '🌨️ 初級探險者' : '🎪 新手滑手';
+  const level = explored >= 20 ? '滑雪大師' :
+    explored >= 10 ? '中級滑手' :
+      explored >= 3 ? '初級探險者' : '新手滑手';
 
   const medalHtml = [
-    { icon: '🥇', label: '金牌', key: 'gold' },
-    { icon: '🥈', label: '銀牌', key: 'silver' },
-    { icon: '🥉', label: '銅牌', key: 'bronze' },
+    { icon: 'Gold', label: '金牌', key: 'gold' },
+    { icon: 'Silver', label: '銀牌', key: 'silver' },
+    { icon: 'Bronze', label: '銅牌', key: 'bronze' },
   ].map(m => {
     const cnt = medals[m.key] || progress[m.key] || 0;
     return `<span class="park-pp-medal ${cnt > 0 ? 'earned' : 'locked'}">${m.icon} ${m.label} ×${cnt}</span>`;
@@ -500,18 +508,18 @@ function renderParkProfile() {
   const completedThemes = _PARK_THEME_DEFS.filter(t => t.stages.every(s => visitedSyms.has(s.sym)));
   const themeMedalsHtml = completedThemes.length
     ? `<div class="park-pp-section" style="padding-bottom:0">
-         <div class="park-pp-section-title">🗺️ 主題通關勳章</div>
+         <div class="park-pp-section-title">主題通關勳章</div>
        </div>
        <div class="park-pp-theme-medals">
          ${completedThemes.map((t) => {
       const tIdx = _PARK_THEME_DEFS.indexOf(t);
       return `<div class="park-pp-theme-medal" onclick="toggleParkProfile();openThemeQuest(${tIdx})">
-             <span class="park-pp-theme-medal-icon">${_escHtml(t.icon)}</span>
+             <span class="park-pp-theme-medal-icon">${_parkHtmlIcon(t.icon)}</span>
              <span class="park-pp-theme-medal-info">
                <span class="park-pp-theme-medal-title">${_escHtml(t.title)}</span>
                <span class="park-pp-theme-medal-sub">全 ${t.stages.length} 關通關</span>
              </span>
-             <span class="park-pp-theme-medal-badge">👑 完成</span>
+             <span class="park-pp-theme-medal-badge">完成</span>
            </div>`;
     }).join('')}
        </div>` : '';
@@ -521,12 +529,12 @@ function renderParkProfile() {
   panel.innerHTML = `
     <div class="park-pp-inner">
       <div class="park-pp-header">
-        <div class="park-pp-avatar">⛷️</div>
+        <div class="park-pp-avatar">${_parkHtmlIcon('ski')}</div>
         <div>
           <div class="park-pp-name">冒險者</div>
           <div class="park-pp-level">${level}</div>
         </div>
-        <button class="park-pp-close" onclick="toggleParkProfile()">✕</button>
+        <button class="park-pp-close" onclick="toggleParkProfile()">X</button>
       </div>
       <div class="park-pp-stats">
         <div class="park-pp-stat">
@@ -543,12 +551,12 @@ function renderParkProfile() {
         </div>
       </div>
       <div class="park-pp-section">
-        <div class="park-pp-section-title">🏅 滑雪獎牌</div>
+        <div class="park-pp-section-title">滑雪獎牌</div>
         <div class="park-pp-medal-row">${medalHtml}</div>
       </div>
       ${themeMedalsHtml}
       <div class="park-pp-section" style="padding-bottom:0.4rem">
-        <div class="park-pp-section-title">📋 闖關紀錄</div>
+        <div class="park-pp-section-title">闖關紀錄</div>
       </div>
       <div class="park-pp-history-list">${historyHtml}</div>
     </div>`;
@@ -558,7 +566,7 @@ function renderParkProfile() {
 function _initParkSnowflakes() {
   const canvas = document.getElementById('parkSnowCanvas');
   if (!canvas || canvas.childElementCount > 0) return;
-  const chars = ['❄', '❅', '❆', '·', '•', '*', '✦'];
+  const chars = ['.', '*', '+'];
   for (let i = 0; i < 38; i++) {
     const flake = document.createElement('span');
     flake.className = 'park-snowflake';
